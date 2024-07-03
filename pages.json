@@ -1,0 +1,170 @@
+{
+	"easycom": {
+		"^u-(.*)": "@/uview-ui/components/u-$1/u-$1.vue"
+	},
+	"pages": [{
+			"path": "pages/login/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/register/index",
+			"style": {
+				"navigationBarTitleText": "注册"
+			}
+		},
+		{
+			"path": "pages/loginwx/index",
+			"style": {
+				"navigationBarTitleText": "登录"
+			}
+		},
+		{
+			"path": "pages/bindphone/index",
+			"style": {
+				"navigationBarTitleText": "绑定手机"
+			}
+		},
+		{
+			"path": "pages/shop/detail",
+			"style": {
+				"navigationBarTitleText": "详情"
+			}
+		},
+		{
+			"path": "pages/shop/order",
+			"style": {
+				"navigationBarTitleText": "订单"
+			}
+		},
+		{
+			"path": "pages/index/index",
+			"style": {
+				"navigationStyle": "custom"
+			}
+		},
+		{
+			"path": "pages/classifications/index",
+			"style": {
+				"navigationBarTitleText": "分类"
+			}
+		},
+		{
+			"path": "pages/shoppingCart/index",
+			"style": {
+				"navigationBarTitleText": "购物车"
+			}
+		}, {
+			"path": "pages/my/index",
+			"style": {
+				"navigationBarTitleText": "我的"
+			}
+		}, {
+			"path": "pages/my/address",
+			"style": {
+				"navigationBarTitleText": "收货地址"
+			}
+		}, {
+			"path": "pages/my/addSite",
+			"style": {
+				"navigationBarTitleText": "添加收货地址"
+			}
+		}, {
+			"path": "pages/protocol/index",
+			"style": {
+				"navigationBarTitleText": "用户协议"
+			}
+		},
+		{
+			"path": "pages/my/goodsTgDt",
+			"style": {
+				"navigationBarTitleText": "商品推广中心",
+				"enablePullDownRefresh": false,				
+				"navigationStyle": "custom"			
+			}
+		},
+		{
+			"path" : "pages/my/fyJl",
+			"style" : 
+			{
+				"navigationBarTitleText" : "分佣记录",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/my/team",
+			"style" : 
+			{
+				"navigationBarTitleText" : "我的团队",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path": "pages/my/pt/goodsTgDt",
+			"style": {
+				"navigationBarTitleText": "平台推广中心",
+				"enablePullDownRefresh": false,				
+				"navigationStyle": "custom"			
+			}
+		},
+		{
+			"path" : "pages/my/pt/fyJl",
+			"style" : 
+			{
+				"navigationBarTitleText" : "分佣记录",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/my/pt/team",
+			"style" : 
+			{
+				"navigationBarTitleText" : "我的团队",
+				"enablePullDownRefresh" : false
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "vue-mall-beautiful",
+		"navigationBarBackgroundColor": "#FFFFFF",
+		"backgroundColor": "#FFFFFF"
+	},
+	"tabBar": {
+		"color": "#999999",
+		"selectedColor": "#333333",
+		"backgroundColor": "#FFFFFF",
+		"borderStyle": "black",
+		"list": [
+			// {
+			// 	"pagePath": "pages/login/index",
+			// 	"iconPath": "static/navs/index.png",
+			// 	"selectedIconPath": "static/navs/index_select.png",
+			// 	"text": "登录"
+			// },
+			{
+				"pagePath": "pages/index/index",
+				"iconPath": "static/navs/index.png",
+				"selectedIconPath": "static/navs/index_select.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/classifications/index",
+				"iconPath": "static/navs/classifications.png",
+				"selectedIconPath": "static/navs/classifications_select.png",
+				"text": "分类"
+			}, {
+				"pagePath": "pages/shoppingCart/index",
+				"iconPath": "static/navs/shoppingCart.png",
+				"selectedIconPath": "static/navs/shoppingCart_select.png",
+				"text": "购物车"
+			}, {
+				"pagePath": "pages/my/index",
+				"iconPath": "static/navs/my.png",
+				"selectedIconPath": "static/navs/my_select.png",
+				"text": "我的"
+			}
+		]
+	}
+}
