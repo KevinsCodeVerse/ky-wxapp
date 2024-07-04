@@ -7,34 +7,34 @@
 						<view class="page-box">
 							<view class="order">
 								<u-checkbox-group @change="checkboxGroupChange">
-									<u-checkbox
-										class="item-bgc"
-										shape="circle"
-										@change="checkboxChange"
-										v-model="item.checked"
-										v-for="(item, index) in goodsList"
-										:key="index"
-										:name="item.proName"
-										style="background-color: #fff; border-radius: 20rpx"
-									>
-										<view class="item">
-											<view class="left">
-												<image :src="$comm.fullPath(item.proCover)" mode="aspectFill"></image>
-											</view>
-											<view class="content">
-												<view class="title u-line-2">{{ item.proName }}</view>
-												<u-tag :text="formatSkuName(item.skuName)" type="info" mode="dark" />
-												<view class="price">
-													<view class="price-text">
-														<span>￥</span>
-														{{ priceInt(item.price) }}
-														<text class="decimal">.{{ priceDecimal(item.price) }}</text>
+									<view v-for="(item, index) in goodsList" :key="index">
+										<u-checkbox
+											class="item-bgc"
+											shape="circle"
+											@change="checkboxChange"
+											v-model="item.checked"
+											:name="item.proName"
+											style="background-color: #fff; border-radius: 20rpx"
+										>
+											<view class="item">
+												<view class="left">
+													<image :src="$comm.fullPath(item.proCover)" mode="aspectFill"></image>
+												</view>
+												<view class="content">
+													<view class="title u-line-2">{{ item.proName }}</view>
+													<u-tag :text="formatSkuName(item.skuName)" type="info" mode="dark" />
+													<view class="price">
+														<view class="price-text">
+															<span>￥</span>
+															{{ priceInt(item.price) }}
+															<text class="decimal">.{{ priceDecimal(item.price) }}</text>
+														</view>
+														<u-number-box v-model="item.count" @change="valChange(item)"></u-number-box>
 													</view>
-													<u-number-box v-model="item.count" @change="valChange(item)"></u-number-box>
 												</view>
 											</view>
-										</view>
-									</u-checkbox>
+										</u-checkbox>
+									</view>
 								</u-checkbox-group>
 							</view>
 						</view>
@@ -64,7 +64,8 @@ export default {
 	data() {
 		return {
 			isAllChecked: false,
-			goodsList: []
+			goodsList: [],
+			swiperCurrent: 0
 		};
 	},
 	computed: {
@@ -169,7 +170,6 @@ page {
 	height: 100%;
 	background-color: #f2f2f2;
 }
-
 /* #endif */
 </style>
 
@@ -222,7 +222,6 @@ page {
 			.price {
 				display: flex;
 				justify-content: space-between;
-
 				align-items: center;
 				font-weight: 700;
 				font-size: 32rpx;
@@ -246,7 +245,6 @@ page {
 	margin-top: 20rpx;
 	text-align: right;
 	font-size: 24rpx;
-
 	.total-price {
 		font-size: 32rpx;
 	}
@@ -258,7 +256,6 @@ page {
 	padding: 0 10rpx;
 	justify-content: space-between;
 	align-items: center;
-
 	.btn {
 		line-height: 52rpx;
 		width: 160rpx;
@@ -268,7 +265,6 @@ page {
 		text-align: center;
 		color: $u-type-info-dark;
 	}
-
 	.evaluate {
 		color: #ffffff;
 		border: 2rpx solid transparent;
@@ -280,20 +276,17 @@ page {
 	text-align: center;
 	margin: 200rpx auto;
 	font-size: 32rpx;
-
 	image {
 		width: 164rpx;
 		height: 164rpx;
 		border-radius: 50%;
 		margin-bottom: 20rpx;
 	}
-
 	.tips {
 		font-size: 24rpx;
 		color: #999999;
 		margin-top: 20rpx;
 	}
-
 	.btn {
 		margin: 80rpx auto;
 		width: 200rpx;
@@ -325,7 +318,6 @@ page {
 		z-index: 1000;
 		.radio {
 			display: flex;
-
 			font-weight: 400;
 			font-size: 26rpx;
 			text-align: left;

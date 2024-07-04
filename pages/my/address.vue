@@ -26,8 +26,8 @@
 								<u-icon @click="editAddress(address)" v-if="!isManage" name="arrow-right" size="32rpx"></u-icon>
 							</view>
 							<view v-if="!isManage" class="line"></view>
-							<view v-if="!isManage" class="set-default" @click.stop="setDefaultAddress(index)">
-								<view class="left">
+							<view v-if="!isManage" class="set-default">
+								<view class="left" @click.stop="selectDefaultAddress(index)">
 									<radio color="#002FA7" :checked="address.isDefault" />
 									<text class="default">设为默认地址</text>
 								</view>
@@ -90,9 +90,6 @@ export default {
 			}
 		},
 		editAddress(row) {
-			// uni.navigateTo({
-			// 	url: `/pages/my/addSite?id=${id}`
-			// });
 			const query = JSON.stringify(row);
 			uni.navigateTo({
 				url: `/pages/my/addSite?query=${query}`
@@ -103,9 +100,31 @@ export default {
 				url: '/pages/my/addSite'
 			});
 		},
-		setDefaultAddress(index) {
+		selectDefaultAddress(index) {
 			this.addresses.forEach((address, i) => {
-				address.isDefault = i === index;
+				address.isDefault = i === index ? 1 : 0;
+			});
+			this.updateDefaultAddress(this.addresses[index].id);
+		},
+		updateDefaultAddress(id) {
+			this.$request.post({
+				url: '/user/userAddress/update',
+				params: {
+					id: id,
+					isDefault: 1
+				},
+				success: () => {
+					uni.showToast({
+						icon: 'success',
+						title: '设置成功'
+					});
+				},
+				fail: () => {
+					uni.showToast({
+						icon: 'none',
+						title: '设置失败'
+					});
+				}
 			});
 		},
 		deleteAddress(row) {
@@ -115,6 +134,10 @@ export default {
 					ids: JSON.stringify([row.id])
 				},
 				success: (res) => {
+					uni.showToast({
+						icon: 'success',
+						title: '删除成功'
+					});
 					this.getAddressList();
 				}
 			});
@@ -127,7 +150,6 @@ export default {
 		},
 		deleteSelectedAddresses() {
 			const ids = this.addresses.filter((address) => address.isSelected).map((address) => address.id);
-			console.log('ids', ids);
 			this.$request.post({
 				url: '/user/userAddress/delete',
 				params: {
@@ -145,6 +167,7 @@ export default {
 	}
 };
 </script>
+
 <style lang="scss" scoped>
 .page {
 	padding: 20rpx;

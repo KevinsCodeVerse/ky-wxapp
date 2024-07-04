@@ -8,14 +8,35 @@
 			</scroll-view>
 			<scroll-view :scroll-top="scrollRightTop" scroll-y scroll-with-animation class="right-box" @scroll="rightScroll">
 				<view class="page-view">
-					<view class="class-item" :id="'item' + index" v-for="(item, index) in subCategories" :key="index">
-						<view class="item-title">
-							<text>{{ item.name }}</text>
+					<!-- 返回按钮 -->
+					<view v-if="categoryStack.length > 1" class="back-button" @tap="goBack">
+						<text>返回</text>
+					</view>
+
+					<!-- 分类列表 -->
+					<view class="category-list">
+						<view class="class-item" v-for="(item, index) in subCategories" :key="index">
+							<view class="item-title" @tap="loadSubCategoryOrProducts(item)">
+								<u-tag :text="item.name" mode="dark" />
+							</view>
 						</view>
-						<view class="item-container">
-							<view class="thumb-box" v-for="(item1, index1) in item.foods" :key="index1" @tap="loadSubCategory(item1)">
-								<image class="item-menu-image" :src="item1.icon" mode=""></image>
-								<view class="item-menu-name">{{ item1.name }}</view>
+					</view>
+
+					<!-- 商品列表 -->
+					<view class="product-list" v-if="products.length > 0">
+						<view class="product-item" v-for="(product, index) in products" :key="index">
+							<image class="product-image" :src="$comm.fullPath(product.cover)" mode="aspectFit"></image>
+
+							<view class="product-info">
+								<text class="product-name">{{ product.name }}</text>
+
+								<view class="product-price">￥{{ product.price }}</view>
+								<view class="flex-box">
+									<view class="">
+										<view class="product-originalPrice">￥{{ product.originalPrice }}</view>
+										<view class="right">会员价最高可省{{ product.vipPro }}元</view>
+									</view>
+								</view>
 							</view>
 						</view>
 					</view>
@@ -42,41 +63,131 @@ export default {
 			scrollRightTop: 0, // 右边栏目scroll-view的滚动条高度
 			timer: null, // 定时器
 			currentPId: -1, // 当前分类的父ID
-			isLoading: false // 防止重复请求的标志
+			isLoading: false, // 防止重复请求的标志
+			shopId: 8, // 商家ID，假设为8
+			products: [], // 当前显示的商品列表
+			categoryStack: [] // 分类堆栈
 		};
 	},
 	onLoad() {
-		this.getCategories(-1); // 获取一级分类
+		this.getShopId();
 	},
 	methods: {
-		// 获取分类数据
-		getCategories(pId) {
-			if (this.isLoading) return; // 防止重复请求
-			this.isLoading = true;
+		getShopId() {
 			this.$request.post({
-				url: '/user/userInfo/indexCategoryList',
-				params: {
-					infoId: 8, // 商家ID，假设为8
-					pId: pId
-				},
+				url: '/user/userInfo/bindTenant',
 				success: (res) => {
-					if (pId === -1) {
-						this.categories = res.result; // 设置一级分类
-					} else {
-						this.subCategories = res.result; // 设置子分类
-					}
-					this.isLoading = false;
+					this.shopId = res[0].shopId;
+					this.infoId = res[0].tenantId;
+					this.getCategoriesAndDefaultSubCategories(-1); // 获取一级分类并默认选中第一个
+					this.categoryStack.push(-1); // 初始分类ID
 				},
 				fail: () => {
 					this.isLoading = false;
 				}
 			});
 		},
+		// 获取一级分类和默认二级分类数据
+		getCategoriesAndDefaultSubCategories(pId) {
+			if (this.isLoading) return; // 防止重复请求
+			this.isLoading = true;
+			this.$request.post({
+				url: '/user/userInfo/indexCategoryList',
+				params: {
+					infoId: this.infoId, // 商家ID
+					pId: pId
+				},
+				success: (res) => {
+					if (res.length === 0) {
+						uni.showToast({
+							icon: 'none',
+							title: '没有更多分类了'
+						});
+					} else {
+						if (pId === -1) {
+							this.categories = res; // 设置一级分类
+							this.loadSubCategoryOrProducts(this.categories[0]); // 默认加载第一个分类的子分类和商品
+						} else {
+							this.subCategories = res; // 设置子分类
+							this.checkForProductsOrSubCategories();
+						}
+					}
+					this.isLoading = false;
+					this.$nextTick(() => {
+						this.observer();
+					});
+				},
+				fail: () => {
+					this.isLoading = false;
+				}
+			});
+		},
+		// 获取分类和商品数据
+		getCategoriesAndProducts(pId) {
+			this.$request.post({
+				url: '/user/userInfo/indexCategoryList',
+				params: {
+					infoId: this.infoId, // 商家ID
+					pId: pId
+				},
+				success: (res) => {
+					if (res.length === 0) {
+						uni.showToast({
+							icon: 'none',
+							title: '没有更多分类了'
+						});
+					} else {
+						this.subCategories = res; // 设置子分类
+						this.checkForProductsOrSubCategories();
+					}
+				},
+				fail: () => {
+					this.isLoading = false;
+				}
+			});
+		},
+		// 获取商品列表数据
+		getProductsByCategory(cId) {
+			this.$request.post({
+				url: '/user/userInfo/indexProListByCategory',
+				params: {
+					cId: cId, // 商品分类ID
+					shopId: this.shopId // 上架ID
+				},
+				success: (res) => {
+					if (res.length === 0) {
+						uni.showToast({
+							icon: 'none',
+							title: '没有更多商品了'
+						});
+					} else {
+						this.products = res; // 设置商品列表
+					}
+				},
+				fail: () => {
+					uni.showToast({
+						icon: 'none',
+						title: '加载商品失败'
+					});
+				}
+			});
+		},
+		// 检查是否有子分类或商品
+		checkForProductsOrSubCategories() {
+			if (this.subCategories.length === 0 && this.products.length === 0) {
+				uni.showToast({
+					icon: 'none',
+					title: '没有更多数据了'
+				});
+			}
+		},
 		// 点击左边的栏目切换
 		swichMenu(index) {
 			this.current = index;
 			this.currentPId = this.categories[index].id;
-			this.getCategories(this.currentPId);
+			this.categoryStack.push(this.currentPId);
+			this.getCategoriesAndProducts(this.currentPId);
+			this.getProductsByCategory(this.currentPId);
 			this.scrollTop = index * this.menuItemHeight + this.menuItemHeight / 2 - this.menuHeight / 2;
 		},
 		// 获取一个目标元素的高度
@@ -93,7 +204,7 @@ export default {
 							// 如果节点尚未生成，res值为null，循环调用执行
 							if (!res) {
 								setTimeout(() => {
-									this.getElRect(elClass);
+									this.getElRect(elClass, dataVal);
 								}, 10);
 								return;
 							}
@@ -182,10 +293,18 @@ export default {
 				}
 			}, 10);
 		},
-		// 加载下一级分类
-		loadSubCategory(item) {
-			this.currentPId = item.id;
-			this.getCategories(this.currentPId);
+		// 加载下一级分类或商品列表
+		loadSubCategoryOrProducts(item) {
+			this.categoryStack.push(item.id); // 将当前分类ID入栈
+			this.getCategoriesAndProducts(item.id);
+			this.getProductsByCategory(item.id);
+		},
+		// 返回上一级分类
+		goBack() {
+			this.categoryStack.pop(); // 从堆栈中弹出当前分类ID
+			const previousCategoryId = this.categoryStack[this.categoryStack.length - 1];
+			this.getCategoriesAndProducts(previousCategoryId);
+			this.getProductsByCategory(previousCategoryId);
 		}
 	}
 };
@@ -236,7 +355,6 @@ export default {
 	&:before {
 		content: '';
 		position: absolute;
-		border-left: 4px solid $base-color-default;
 		height: 32rpx;
 		left: 0;
 		top: 39rpx;
@@ -251,45 +369,99 @@ export default {
 	padding: 16rpx;
 }
 
-.class-item {
-	margin-bottom: 30rpx;
-	background-color: #fff;
-	padding: 16rpx;
-	border-radius: 8rpx;
-}
-
-.class-item:last-child {
-	min-height: 100vh;
-}
-
-.item-title {
+.back-button {
 	font-size: 26rpx;
-	color: $u-main-color;
+	color: #002fa7;
 	font-weight: bold;
+	float: right;
+	margin: 15rpx 0px;
+	cursor: pointer;
 }
 
-.item-menu-name {
-	font-weight: normal;
-	font-size: 24rpx;
-	color: $u-main-color;
-}
-
-.item-container {
+.category-list {
 	display: flex;
 	flex-wrap: wrap;
 }
 
-.thumb-box {
-	width: 33.333333%;
+.class-item {
+	margin-top: 5rpx;
 	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
-	margin-top: 20rpx;
+	justify-content: space-around;
+	padding: 10rpx 10rpx;
+	border-radius: 8rpx;
+	box-sizing: border-box;
 }
 
-.item-menu-image {
-	width: 120rpx;
-	height: 120rpx;
+.item-title {
+	font-size: 26rpx;
+	color: #002fa7;
+	font-weight: bold;
+	cursor: pointer;
+}
+
+.flex-box {
+	display: flex;
+	justify-content: space-between;
+	.right {
+		width: 204rpx;
+		height: 56rpx;
+		border-radius: 8rpx;
+		background: #faf5eb;
+		font-weight: 400;
+		font-size: 22rpx;
+		line-height: 56rpx;
+		text-align: center;
+		color: #bf8739;
+	}
+}
+
+.product-list {
+}
+
+.product-item {
+	display: flex;
+	border-radius: 20rpx;
+	margin-bottom: 16rpx;
+	background-color: #fff;
+	padding: 10rpx;
+}
+
+.product-image {
+	width: 192rpx;
+	height: 192rpx;
+	border-radius: 20rpx;
+	margin-right: 16rpx;
+}
+
+.product-info {
+	display: flex;
+	flex-direction: column;
+	flex-direction: column;
+}
+
+.product-name {
+	font-size: 30rpx;
+	color: #333;
+	margin-bottom: 8rpx;
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.product-price {
+	font-weight: 700;
+	font-size: 32rpx;
+	text-align: left;
+	color: #bf8739;
+}
+.product-originalPrice {
+	font-weight: 400;
+	font-size: 20rpx;
+	text-align: left;
+	color: #ccc;
+	line-height: 46rpx;
+	text-decoration: line-through;
 }
 </style>
