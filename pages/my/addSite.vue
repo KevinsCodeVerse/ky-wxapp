@@ -1,140 +1,199 @@
+<template>
+	<view class="wrap">
+		<view class="top">
+			<view class="item">
+				<view class="left">收件人</view>
+				<input v-model="form.name" type="text" placeholder-class="line" placeholder="请填写收货人姓名" />
+			</view>
+			<view class="item">
+				<view class="left">手机号码</view>
+				<input v-model="form.phone" type="text" placeholder-class="line" placeholder="请填写收货人手机号" />
+			</view>
+			<view class="item" @tap="showRegionPicker">
+				<view class="left">所在地区</view>
+				<input :value="displayRegion" disabled type="text" placeholder-class="line" placeholder="省市区县、乡镇等" />
+			</view>
+			<view class="item address">
+				<view class="left">详细地址</view>
+				<textarea v-model="form.address" type="text" placeholder-class="line" placeholder="请选择街道、楼牌等" />
+			</view>
+			<view class="bottom">
+				<view class="default">
+					<view class="left">
+						<view class="set">设为默认</view>
+					</view>
+					<view class="right">
+						<switch :checked="form.isDefault == 1 ? true : false" @change="changeDefault" color="#002FA7" />
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<u-picker mode="region" ref="uPicker" v-model="show" :default-region="defaultRegion" @confirm="onRegionConfirm" />
+		<view class="addSite" @tap="saveAddress">
+			<view class="add">保存</view>
+		</view>
+	</view>
+</template>
+
 <script>
 export default {
 	data() {
 		return {
-			isManage: false,
-			params: {
-				pageNo: 1,
-				pageSize: 200
+			show: false,
+			form: {
+				id: '',
+				name: '',
+				phone: '',
+				region: '',
+				address: '',
+				isDefault: false
 			},
-			addresses: []
+			defaultRegion: []
 		};
 	},
 	computed: {
-		hasSelected() {
-			const result = this.addresses.some((address) => address.isSelected);
-			console.log('hasSelected:', result);
-			return result;
+		displayRegion() {
+			return this.form.region;
 		}
 	},
-	watch: {
-		hasSelected(newVal) {
-			if (newVal) {
-				const defaultAddress = this.addresses.find((address) => address.isSelected);
-				if (defaultAddress) {
-					this.setDefaultAddress(defaultAddress);
-				}
-			}
+	onLoad(options) {
+		if (options.query) {
+			this.getAddressDetail(JSON.parse(options.query));
 		}
 	},
-	onLoad() {
-		this.getAddressList();
-	},
-	onShow() {
-		this.getAddressList();
+	onReady() {
+		this.setDefaultRegion();
 	},
 	methods: {
-		getAddressList() {
-			this.$request.post({
-				url: '/user/userAddress/list',
-				params: this.params,
-				success: (res) => {
-					this.addresses = res.list.map((address) => {
-						address.isSelected = false;
-						return address;
-					});
-					console.log('地址', res);
-				}
-			});
+		getAddressDetail(query) {
+			this.form = {
+				id: query.id,
+				address: query.address,
+				name: query.name,
+				isDefault: query.isDefault,
+				phone: query.phone,
+				region: query.region
+			};
+			this.setDefaultRegion();
 		},
-		toggleManage() {
-			this.isManage = !this.isManage;
-			if (!this.isManage) {
-				this.addresses.forEach((address) => (address.isSelected = false));
+		setDefaultRegion() {
+			if (!this.form.region) return;
+			const regionArray = this.form.region.split(' ');
+			this.defaultRegion = regionArray;
+		},
+		showRegionPicker() {
+			this.show = true;
+		},
+		onRegionConfirm(e) {
+			const { province, city, area } = e;
+			this.form.region = `${province.label} ${city.label} ${area.label}`;
+			this.defaultRegion = [province.label, city.label, area.label];
+		},
+		changeDefault(e) {
+			this.form.isDefault = e.detail.value ? 1 : 0;
+		},
+		restForm() {
+			this.form = {
+				id: '',
+				name: '',
+				phone: '',
+				region: '',
+				address: '',
+				isDefault: false
+			};
+		},
+		saveAddress() {
+			if (!this.validateForm()) {
+				return;
+			}
+			const data = {
+				id: this.form.id ? this.form.id : '',
+				address: this.form.address,
+				isDefault: this.form.isDefault ? 1 : 0,
+				name: this.form.name,
+				phone: this.form.phone,
+				region: this.form.region
+			};
+			if (this.form.id) {
+				this.$request.post({
+					url: '/user/userAddress/update',
+					params: data,
+					success: (res) => {
+						uni.showToast({
+							title: '修改成功',
+							icon: 'success'
+						});
+						uni.navigateBack();
+						this.restForm();
+					},
+					fail: (err) => {
+						uni.showToast({
+							title: '修改失败，请重试',
+							icon: 'none'
+						});
+					}
+				});
+			} else {
+				this.form.id = '';
+				this.$request.post({
+					url: '/user/userAddress/add',
+					params: data,
+					success: (res) => {
+						uni.showToast({
+							title: '新增成功',
+							icon: 'success'
+						});
+						uni.navigateBack();
+						this.restForm();
+					},
+					fail: (err) => {
+						uni.showToast({
+							title: '新增失败，请重试',
+							icon: 'none'
+						});
+					}
+				});
 			}
 		},
-		editAddress(row) {
-			const query = JSON.stringify(row);
-			uni.navigateTo({
-				url: `/pages/my/addSite?query=${query}`
-			});
-		},
-		addAddress() {
-			uni.navigateTo({
-				url: '/pages/my/addSite'
-			});
-		},
-		setDefaultAddress(address) {
-			console.log('setDefaultAddress called with address:', address);
-			this.$request.post({
-				url: '/user/userAddress/update',
-				params: {
-					id: address.id,
-					isDefault: 1
-				},
-				success: () => {
-					this.addresses.forEach((addr) => {
-						addr.isDefault = addr.id === address.id ? 1 : 0;
-						addr.isSelected = addr.id === address.id;
-					});
-					uni.showToast({
-						icon: 'success',
-						title: '设置默认地址成功'
-					});
-				},
-				fail: () => {
-					uni.showToast({
-						icon: 'none',
-						title: '设置默认地址失败'
-					});
-				}
-			});
-		},
-		deleteAddress(row) {
-			this.$request.post({
-				url: '/user/userAddress/delete',
-				params: {
-					ids: JSON.stringify([row.id])
-				},
-				success: (res) => {
-					uni.showToast({
-						icon: 'success',
-						title: '删除成功'
-					});
-					this.getAddressList();
-				}
-			});
-		},
-		selectAddress(index) {
-			console.log('selectAddress called for index:', index);
-			this.$set(this.addresses, index, {
-				...this.addresses[index],
-				isSelected: !this.addresses[index].isSelected
-			});
-		},
-		selectDefaultAddress(index) {
-			console.log('selectDefaultAddress called for index:', index);
-			this.addresses.forEach((address, i) => {
-				address.isSelected = i === index;
-			});
-			this.setDefaultAddress(this.addresses[index]);
-		},
-		deleteSelectedAddresses() {
-			const ids = this.addresses.filter((address) => address.isSelected).map((address) => address.id);
-			console.log('ids', ids);
-			this.$request.post({
-				url: '/user/userAddress/delete',
-				params: {
-					ids: JSON.stringify(ids)
-				},
-				success: (res) => {
-					uni.showToast({
-						icon: 'success',
-						title: '删除成功'
-					});
-					this.getAddressList();
-				}
-			});
+		validateForm() {
+			const phoneRegex = /^1[3-9]\d{9}$/; // 简单的手机号正则表达式，适用于中国大陆手机号
+			if (!this.form.name) {
+				uni.showToast({
+					title: '请填写收件人姓名',
+					icon: 'none'
+				});
+				return false;
+			}
+			if (!this.form.phone) {
+				uni.showToast({
+					title: '请填写收件人手机号',
+					icon: 'none'
+				});
+				return false;
+			}
+			if (!phoneRegex.test(this.form.phone)) {
+				uni.showToast({
+					title: '手机号码格式不正确',
+					icon: 'none'
+				});
+				return false;
+			}
+			if (!this.form.region) {
+				uni.showToast({
+					title: '请选择所在地区',
+					icon: 'none'
+				});
+				return false;
+			}
+			if (!this.form.address) {
+				uni.showToast({
+					title: '请填写详细地址',
+					icon: 'none'
+				});
+				return false;
+			}
+			return true;
 		}
 	}
 };

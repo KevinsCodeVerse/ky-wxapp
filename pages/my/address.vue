@@ -115,10 +115,6 @@ export default {
 					ids: JSON.stringify([row.id])
 				},
 				success: (res) => {
-					uni.showToast({
-						icon: 'success',
-						title: '删除成功'
-					});
 					this.getAddressList();
 				}
 			});
