@@ -123,6 +123,35 @@
 				"navigationBarTitleText" : "我的团队",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/my/withdrawal/withdrawal",
+			"style" : 
+			{
+				"navigationBarTitleText" : "进行提现",
+				"enablePullDownRefresh" : false,
+				"navigationBarBackgroundColor": "#ffcc00",
+				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path" : "pages/my/withdrawal/bankcard",
+			"style" : 
+			{
+				"navigationBarTitleText" : "查看/修改卡号信息",
+				"enablePullDownRefresh" : false
+				
+			}
+		},
+		{
+			"path" : "pages/my/pt/withdrawal/withdrawal",
+			"style" : 
+			{
+				"navigationBarTitleText" : "进行提现",
+				"enablePullDownRefresh" : false,
+				"navigationBarBackgroundColor": "#4B97E6",
+				"navigationBarTextStyle": "white"
+			}
 		}
 	],
 	"globalStyle": {

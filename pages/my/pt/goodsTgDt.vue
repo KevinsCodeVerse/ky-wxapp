@@ -66,7 +66,7 @@
 							<view>888888.88</view>
 						</view>
 						<view
-							style="width: 104rpx;height: 48rpx;border-radius: 24rpx;background: #ffffff00;border: 2rpx solid #fff;">
+							style="width: 104rpx;height: 48rpx;border-radius: 24rpx;background: #ffffff00;border: 2rpx solid #fff;" @click="openPage('pages/my/pt/withdrawal/withdrawal',2)">
 							<view style="font-size: 28rpx;text-align: center;color: #fff;line-height: 48rpx;">
 								提现
 							</view>

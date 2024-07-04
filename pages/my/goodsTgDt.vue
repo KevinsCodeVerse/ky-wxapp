@@ -37,8 +37,11 @@
 							</view>
 						</view>
 					</view>
-					<view style="font-size: 26rpx;color: #666666;">
-						距下一级还需2个直推业绩和5个间推业绩
+					<view style="font-size: 26rpx;color: #666666;" v-if="nextZt!==-1">
+						距下一级还需{{nextZt}}个直推业绩和{{nextTeamTj}}个间推业绩
+					</view>
+					<view style="font-size: 26rpx;color: #666666;" v-else>
+						您当前已是至尊合伙人，享受平台最大权益
 					</view>
 				</view>
 
@@ -66,7 +69,7 @@
 					<view style="display: flex; justify-content: space-between; font-size: 28rpx; margin-top: 15rpx;">
 						<view>冻结中：￥1000.00</view>
 						<view style="display: flex; gap: 24rpx;">
-							<view>提现 </view>
+							<view @click="openPage('pages/my/withdrawal/withdrawal',2)">提现 </view>
 							<view> | </view>
 							<view>转换 </view>
 						</view>
@@ -218,11 +221,27 @@
 	export default {
 		data() {
 			return {
+				nextZt: -1,
+				nextTeamTj: -1,
 				ywDialog: false
 
 			};
 		},
+		onLoad(){
+			this.tgInfo()
+		},
 		methods: {
+			tgInfo(){
+				this.$request.post({
+					url: 'user/userRoyalFlowPro/tgInfo',
+					params: {
+						infoId: uni.getStorageSync("infoId"),						
+					},
+					success: (res) => {
+						
+					}
+				});
+			},
 			openPage(path, type) {
 				if (!path) {
 					uni.navigateBack({
@@ -233,8 +252,8 @@
 				let currentRoute = pages[pages.length - 1].route; // 获取当前页面路由
 				if (path === currentRoute) {
 					return;
-				}			
-				if (type==1) {				
+				}
+				if (type == 1) {
 					uni.redirectTo({
 						url: path
 					})

@@ -58,7 +58,7 @@
 			</view>
 			<view class="">
 				<u-cell-group>
-					<u-cell-item icon="setting" title="平台推广"></u-cell-item>
+					<u-cell-item icon="setting" title="平台推广" @click="openPage('pages/my/pt/goodsTgDt')"></u-cell-item>
 				</u-cell-group>
 			</view>
 		</view>
