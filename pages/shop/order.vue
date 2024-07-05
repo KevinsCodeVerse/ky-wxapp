@@ -103,7 +103,7 @@ export default {
 	methods: {
 		getDeafultAddress() {
 			this.$request.post({
-				url: '/user/userAddress/getDefaultAddress',
+				url: 'user/userAddress/getDefaultAddress',
 				success: (res) => {
 					this.address = {
 						id: res.id,
@@ -126,7 +126,7 @@ export default {
 				orderData.carIds = JSON.stringify(this.carIds);
 				console.log('orderData', orderData);
 				this.$request.post({
-					url: '/user/userOrder/shopCarSettlement',
+					url: 'user/userOrder/shopCarSettlement',
 					params: orderData,
 					success: (res) => {
 						uni.showToast({
@@ -150,7 +150,7 @@ export default {
 					count: this.products[0].quantity
 				};
 				this.$request.post({
-					url: '/user/userOrder/submitOrder',
+					url: 'user/userOrder/submitOrder',
 					params: orderData,
 					success: (res) => {
 						uni.showToast({

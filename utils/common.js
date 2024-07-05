@@ -1,6 +1,6 @@
 // const baseUrl = 'http://tcgz.mtfsoft.cn/api/'; // 线上
-const baseUrl = 'http://120.77.254.156/api/'; // 线上
-// const baseUrl = 'http://nobug-w.natapp1.cc/';  // 内网穿透
+// const baseUrl = 'http://120.77.254.156/api/'; // 线上
+const baseUrl = 'http://nobug-w.natapp1.cc/';  // 内网穿透
 
 // const imgUrl = 'http://tcgz.mtfsoft.cn/api/'; // 线上
 const imgUrl = 'http://120.77.254.156'; // 线上

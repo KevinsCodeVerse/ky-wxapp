@@ -117,7 +117,7 @@ export default {
 			};
 			if (this.form.id) {
 				this.$request.post({
-					url: '/user/userAddress/update',
+					url: 'user/userAddress/update',
 					params: data,
 					success: (res) => {
 						uni.showToast({
@@ -137,7 +137,7 @@ export default {
 			} else {
 				this.form.id = '';
 				this.$request.post({
-					url: '/user/userAddress/add',
+					url: 'user/userAddress/add',
 					params: data,
 					success: (res) => {
 						uni.showToast({

@@ -75,7 +75,7 @@ export default {
 	methods: {
 		getShopId() {
 			this.$request.post({
-				url: '/user/userInfo/bindTenant',
+				url: 'user/userInfo/bindTenant',
 				success: (res) => {
 					this.shopId = res[0].shopId;
 					this.infoId = res[0].tenantId;
@@ -92,7 +92,7 @@ export default {
 			if (this.isLoading) return; // 防止重复请求
 			this.isLoading = true;
 			this.$request.post({
-				url: '/user/userInfo/indexCategoryList',
+				url: 'user/userInfo/indexCategoryList',
 				params: {
 					infoId: this.infoId, // 商家ID
 					pId: pId
@@ -125,7 +125,7 @@ export default {
 		// 获取分类和商品数据
 		getCategoriesAndProducts(pId) {
 			this.$request.post({
-				url: '/user/userInfo/indexCategoryList',
+				url: 'user/userInfo/indexCategoryList',
 				params: {
 					infoId: this.infoId, // 商家ID
 					pId: pId
@@ -149,7 +149,7 @@ export default {
 		// 获取商品列表数据
 		getProductsByCategory(cId) {
 			this.$request.post({
-				url: '/user/userInfo/indexProListByCategory',
+				url: 'user/userInfo/indexProListByCategory',
 				params: {
 					cId: cId, // 商品分类ID
 					shopId: this.shopId // 上架ID
