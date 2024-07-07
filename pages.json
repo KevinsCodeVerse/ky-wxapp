@@ -29,9 +29,13 @@
 		{
 			"path": "pages/shop/detail",
 			"style": {
-				"navigationBarTitleText": "详情"
+				"navigationBarTitleText": "详情",
+				"navigationBarBackgroundColor": "#fff",
+				"navigationBarTextStyle": "#000"
+
 			}
 		},
+
 		{
 			"path": "pages/shop/order",
 			"style": {
@@ -48,6 +52,14 @@
 			"path": "pages/classifications/index",
 			"style": {
 				"navigationBarTitleText": "分类"
+			}
+		},
+
+		{
+			"path": "pages/classifications/classDeatil",
+			"style": {
+				"navigationBarTitleText": "分类详情"
+
 			}
 		},
 		{
@@ -80,75 +92,68 @@
 			"path": "pages/my/goodsTgDt",
 			"style": {
 				"navigationBarTitleText": "商品推广中心",
-				"enablePullDownRefresh": false,				
-				"navigationStyle": "custom"			
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
 			}
 		},
 		{
-			"path" : "pages/my/fyJl",
-			"style" : 
-			{
-				"navigationBarTitleText" : "分佣记录",
-				"enablePullDownRefresh" : false
+			"path": "pages/my/fyJl",
+			"style": {
+				"navigationBarTitleText": "分佣记录",
+				"enablePullDownRefresh": false
 			}
 		},
 		{
-			"path" : "pages/my/team",
-			"style" : 
-			{
-				"navigationBarTitleText" : "我的团队",
-				"enablePullDownRefresh" : false
+			"path": "pages/my/team",
+			"style": {
+				"navigationBarTitleText": "我的团队",
+				"enablePullDownRefresh": false
 			}
 		},
 		{
 			"path": "pages/my/pt/goodsTgDt",
 			"style": {
 				"navigationBarTitleText": "平台推广中心",
-				"enablePullDownRefresh": false,				
-				"navigationStyle": "custom"			
+				"enablePullDownRefresh": false,
+				"navigationStyle": "custom"
 			}
 		},
 		{
-			"path" : "pages/my/pt/fyJl",
-			"style" : 
-			{
-				"navigationBarTitleText" : "分佣记录",
-				"enablePullDownRefresh" : false
+			"path": "pages/my/pt/fyJl",
+			"style": {
+				"navigationBarTitleText": "分佣记录",
+				"enablePullDownRefresh": false
 			}
 		},
 		{
-			"path" : "pages/my/pt/team",
-			"style" : 
-			{
-				"navigationBarTitleText" : "我的团队",
-				"enablePullDownRefresh" : false
+			"path": "pages/my/pt/team",
+			"style": {
+				"navigationBarTitleText": "我的团队",
+				"enablePullDownRefresh": false
 			}
 		},
 		{
-			"path" : "pages/my/withdrawal/withdrawal",
-			"style" : 
-			{
-				"navigationBarTitleText" : "进行提现",
-				"enablePullDownRefresh" : false,
+			"path": "pages/my/withdrawal/withdrawal",
+			"style": {
+				"navigationBarTitleText": "进行提现",
+				"enablePullDownRefresh": false,
 				"navigationBarBackgroundColor": "#ffcc00",
 				"navigationBarTextStyle": "white"
 			}
 		},
 		{
-			"path" : "pages/my/withdrawal/bankcard",
-			"style" : 
-			{
-				"navigationBarTitleText" : "查看/修改卡号信息",
-				"enablePullDownRefresh" : false
-				
+			"path": "pages/my/withdrawal/bankcard",
+			"style": {
+				"navigationBarTitleText": "查看/修改卡号信息",
+				"enablePullDownRefresh": false
+
 			}
 		},
 		{
-			"path" : "pages/my/pt/withdrawal/withdrawal",
-			"style" : 
-			{
-				"navigationBarTitleText" : "进行提现",
-				"enablePullDownRefresh" : false,
+			"path": "pages/my/pt/withdrawal/withdrawal",
+			"style": {
+				"navigationBarTitleText": "进行提现",
+				"enablePullDownRefresh": false,
 				"navigationBarBackgroundColor": "#4B97E6",
 				"navigationBarTextStyle": "white"
 			}

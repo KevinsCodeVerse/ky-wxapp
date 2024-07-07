@@ -8,16 +8,14 @@
 			</scroll-view>
 			<scroll-view :scroll-top="scrollRightTop" scroll-y scroll-with-animation class="right-box" @scroll="rightScroll">
 				<view class="page-view">
-					<!-- 返回按钮 -->
-					<view v-if="categoryStack.length > 1" class="back-button" @tap="goBack">
-						<text>返回</text>
-					</view>
-
 					<!-- 分类列表 -->
 					<view class="category-list">
 						<view class="class-item" v-for="(item, index) in subCategories" :key="index">
-							<view class="item-title" @tap="loadSubCategoryOrProducts(item)">
-								<u-tag :text="item.name" mode="dark" />
+							<view class="item-title" @tap="toloadSubCategoryOrProducts(item)">
+								<view class="">
+									<image class="classname-img" :src="$comm.fullPath(item.cover)" mode="aspectFill"></image>
+								</view>
+								<view class="">{{ item.name }}</view>
 							</view>
 						</view>
 					</view>
@@ -106,7 +104,11 @@ export default {
 					} else {
 						if (pId === -1) {
 							this.categories = res; // 设置一级分类
-							this.loadSubCategoryOrProducts(this.categories[0]); // 默认加载第一个分类的子分类和商品
+							if (this.categories.length > 0) {
+								this.currentPId = this.categories[0].id;
+								this.getCategoriesAndProducts(this.currentPId); // 默认加载第一个分类的子分类和商品
+								this.getProductsByCategory(this.currentPId);
+							}
 						} else {
 							this.subCategories = res; // 设置子分类
 							this.checkForProductsOrSubCategories();
@@ -294,6 +296,11 @@ export default {
 			}, 10);
 		},
 		// 加载下一级分类或商品列表
+		toloadSubCategoryOrProducts(item) {
+			uni.navigateTo({
+				url: `/pages/classifications/classDeatil?infoId=${this.infoId}&pId=${item.id}`
+			});
+		},
 		loadSubCategoryOrProducts(item) {
 			this.categoryStack.push(item.id); // 将当前分类ID入栈
 			this.getCategoriesAndProducts(item.id);
@@ -374,7 +381,7 @@ export default {
 	color: #002fa7;
 	font-weight: bold;
 	float: right;
-	margin: 15rpx 0px;
+	margin-bottom: 20rpx;
 	cursor: pointer;
 }
 
@@ -393,12 +400,18 @@ export default {
 }
 
 .item-title {
-	font-size: 26rpx;
-	color: #002fa7;
+	font-weight: 400;
+	font-size: 24rpx;
+	line-height: 36rpx;
+	text-align: center;
+	color: #666;
 	font-weight: bold;
 	cursor: pointer;
 }
-
+.classname-img {
+	width: 114rpx;
+	height: 114rpx;
+}
 .flex-box {
 	display: flex;
 	justify-content: space-between;
