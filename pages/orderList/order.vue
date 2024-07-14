@@ -23,7 +23,14 @@
 				<view class="order-footer">
 					<view class="order-total">实付: ￥{{ order.payAmount }}</view>
 					<view class="order-actions">
-						<button v-for="(button, index) in getButtons(order.status)" :key="index" :class="['order-button', getButtonClass(button)]">{{ button }}</button>
+						<button
+							v-for="(button, index) in getButtons(order.status)"
+							:key="index"
+							:class="['order-button', getButtonClass(button)]"
+							@click="handleButtonClick(button, order)"
+						>
+							{{ button }}
+						</button>
 					</view>
 				</view>
 			</view>
@@ -46,99 +53,12 @@ export default {
 				{ name: '已完成', index: 5 },
 				{ name: '已取消', index: 6 }
 			],
-			orders: [
-				// {
-				// 	address: '广东省-中山市-小榄镇 中山市小榄镇第十八巷子',
-				// 	consignee: '半源半藏',
-				// 	freightAmount: 22.0,
-				// 	orderId: 8854794099,
-				// 	count: 2,
-				// 	type: 0,
-				// 	version: 1,
-				// 	usId: 106,
-				// 	installAmount: 0.0,
-				// 	totalAmount: 77.0,
-				// 	payAmount: 75.46,
-				// 	payType: 1,
-				// 	createTime: 1719994530000,
-				// 	phone: '13531788702',
-				// 	tenantId: 8,
-				// 	userOrderPayList: [
-				// 		{
-				// 			originalPrice: 54.0,
-				// 			orderId: 8854794099,
-				// 			freight: 11.0,
-				// 			discountPrice: 0.0,
-				// 			type: 1,
-				// 			sales: 1,
-				// 			afterSellStatus: 0,
-				// 			couponAmount: 0.0,
-				// 			payAmount: 52.92,
-				// 			price: 52.92,
-				// 			kdnType: 0,
-				// 			prePickUp: 0,
-				// 			id: 37,
-				// 			shopId: 91,
-				// 			skuId: 34,
-				// 			address: '广东省-中山市-小榄镇 中山市小榄镇第十八巷子',
-				// 			consignee: '半源半藏',
-				// 			printStatus: 0,
-				// 			count: 1,
-				// 			updateTime: 1719994530000,
-				// 			userId: 106,
-				// 			billingStatus: 0,
-				// 			subStatus: 0,
-				// 			totalAmount: 54.0,
-				// 			createTime: 1719994530000,
-				// 			phone: '13531788702',
-				// 			proId: 1864,
-				// 			proInfo:
-				// 				'{"avatar":"/files/tenant/pro/87903cde848e1f5837fe3414e83833e2.png","title":"测试酱酒","specName":"{\\"箱\\":\\"一箱\\",\\"瓶\\":\\"两瓶\\"}","specAvatar":"/files/tenant/pro/5a6954904bb5921773e770cbc8ca8935.png"}',
-				// 			status: 0
-				// 		},
-				// 		{
-				// 			originalPrice: 23.0,
-				// 			orderId: 8854794099,
-				// 			freight: 11.0,
-				// 			discountPrice: 0.0,
-				// 			type: 1,
-				// 			sales: 1,
-				// 			afterSellStatus: 0,
-				// 			couponAmount: 0.0,
-				// 			payAmount: 22.54,
-				// 			price: 22.54,
-				// 			kdnType: 0,
-				// 			prePickUp: 0,
-				// 			id: 38,
-				// 			shopId: 91,
-				// 			skuId: 33,
-				// 			address: '广东省-中山市-小榄镇 中山市小榄镇第十八巷子',
-				// 			consignee: '半源半藏',
-				// 			printStatus: 0,
-				// 			count: 1,
-				// 			updateTime: 1719994530000,
-				// 			userId: 106,
-				// 			billingStatus: 0,
-				// 			subStatus: 0,
-				// 			totalAmount: 23.0,
-				// 			createTime: 1719994530000,
-				// 			phone: '13531788702',
-				// 			proId: 1864,
-				// 			proInfo:
-				// 				'{"avatar":"/files/tenant/pro/87903cde848e1f5837fe3414e83833e2.png","title":"测试酱酒","specName":"{\\"箱\\":\\"两箱\\",\\"瓶\\":\\"一瓶\\"}","specAvatar":"/files/tenant/pro/0d643aff6157852213276416573330a9.png"}',
-				// 			status: 0
-				// 		}
-				// 	],
-				// 	id: 36,
-				// 	receiptStatus: 0,
-				// 	status: 0
-				// }
-			],
+			orders: [],
 			pageNo: 1,
 			pageSize: 10,
 			hasMore: true,
-			status: 0, // 默认为全部订单
-			type: 0 // 默认为普通订单
+			status: 0,
+			type: 0
 		};
 	},
 	onLoad(options) {
@@ -151,7 +71,7 @@ export default {
 	methods: {
 		switchTab(index) {
 			this.currentTab = index;
-			this.status = index; // 设置当前的状态
+			this.status = index;
 			this.pageNo = 1;
 			this.orders = [];
 			this.hasMore = true;
@@ -256,6 +176,63 @@ export default {
 					return '';
 			}
 		},
+		handleButtonClick(button, order) {
+			switch (button) {
+				case '取消订单':
+					this.cancelOrder(order.orderId);
+					break;
+				case '支付订单':
+					this.payOrder(order.orderId);
+					break;
+				case '订单详情':
+					this.goToOrderDetail(order.orderId);
+					break;
+				case '确认收货':
+					this.confirmReceipt(order.orderId);
+					break;
+				case '申请售后':
+					this.requestAfterSale(order.orderId);
+					break;
+				case '再来一单':
+					this.reorder(order.orderId);
+					break;
+				case '撤回申请':
+					this.withdrawRequest(order.orderId);
+					break;
+				default:
+					break;
+			}
+		},
+		cancelOrder(orderId) {
+			console.log('取消订单', orderId);
+			// 这里添加取消订单的逻辑
+		},
+		payOrder(orderId) {
+			console.log('支付订单', orderId);
+			// 这里添加支付订单的逻辑
+		},
+		goToOrderDetail(orderId) {
+			console.log('订单详情', orderId);
+			uni.navigateTo({
+				url: `/pages/orderList/orderDetail?orderId=${orderId}`
+			});
+		},
+		confirmReceipt(orderId) {
+			console.log('确认收货', orderId);
+			// 这里添加确认收货的逻辑
+		},
+		requestAfterSale(orderId) {
+			console.log('申请售后', orderId);
+			// 这里添加申请售后的逻辑
+		},
+		reorder(orderId) {
+			console.log('再来一单', orderId);
+			// 这里添加再来一单的逻辑
+		},
+		withdrawRequest(orderId) {
+			console.log('撤回申请', orderId);
+			// 这里添加撤回申请的逻辑
+		},
 		formatSpecName(specName) {
 			try {
 				let spec = JSON.parse(specName);
@@ -311,7 +288,7 @@ export default {
 	font-size: 28rpx;
 	margin: 0 10rpx;
 	&.cancelled {
-		color: #999;
+		color: #909399;
 	}
 	&.pending-payment {
 		color: #f24848;

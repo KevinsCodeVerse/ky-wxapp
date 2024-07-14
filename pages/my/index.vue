@@ -3,11 +3,11 @@
 		<view class="vmb-my-header">
 			<view class="u-flex user-box u-p-r-20 u-p-b-30">
 				<view class="u-m-r-10">
-					<u-avatar :src="pic" width="96rpx" height="96rpx"></u-avatar>
+					<u-avatar :src="avatar" width="96rpx" height="96rpx"></u-avatar>
 				</view>
 				<view class="">
-					<view class="name">范</view>
-					<view class="phone">17710346133</view>
+					<view class="name">{{name}}</view>
+					<view class="phone">{{phone}}</view>
 				</view>
 
 			</view>
@@ -70,13 +70,22 @@ export default {
 	data() {
 		return {
 			pic: 'https://i.gtimg.cn/club/item/face/img/2/15922_100.gif',
-			show: true
+			show: true,
+			name:'',
+			phone:'',
+			avatar:''
 		};
 	},
 	onLoad() {
-
+		this.getInfo()
 	},
 	methods: {
+		getInfo(){
+			
+			this.name = uni.getStorageSync('name')
+			this.phone = uni.getStorageSync('phone')
+			this.avatar = uni.getStorageSync('avatar')
+		},
 		toOrder(status){
 			uni.navigateTo({
 				url:`/pages/orderList/order?status=${status}`

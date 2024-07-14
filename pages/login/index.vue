@@ -6,7 +6,7 @@
 		<view class="handle">
 			<button class="mybtn btn" open-type="getUserInfo" @tap="getUserProfile">微信授权登录</button>
 			<!-- <navigator class="mybtn btn" url="/pages/register/index">手机号登录注册</navigator> -->
-			<!-- 			<view class="protocol">
+			<!-- <view class="protocol">
 				<text>登录代表您已同意</text>
 				<navigator url="/pages/protocol/index">《用户协议》</navigator>
 			</view> -->
@@ -59,7 +59,6 @@ export default {
 		}
 
 		this.phone = options.phone || '';
-
 		this.agentId = options.agentId || '';
 		this.id = options.id || '';
 		this.type = options.type || '';
@@ -78,12 +77,14 @@ export default {
 							url: 'wx/ma/user/public/login',
 							params: {
 								code: res.code,
-								parentId: this.parentId
+								phone: this.phone
 							},
 							success: (result) => {
 								uni.setStorageSync('login', result);
 								uni.setStorageSync('token', result.token);
 								uni.setStorageSync('phone', this.phone);
+								uni.setStorageSync('avatar', result.info.avatar);
+								uni.setStorageSync('name', result.info.nick);
 								this.encryption = result.encryption;
 								this.handleScanParams();
 							},
@@ -180,17 +181,6 @@ export default {
 				success: (res) => {
 					this.info = res;
 					uni.setStorageSync('userId', res.id);
-				}
-			});
-		},
-		getAddressList() {
-			this.$request.post({
-				url: 'user/info/addressList',
-				success: (res) => {
-					uni.setStorageSync('shippingAddress', res.filter((item) => item.isDefault)[0]);
-					if (!res.result && !res[0]) {
-						uni.setStorageSync('shippingAddress', res.result);
-					}
 				}
 			});
 		}
