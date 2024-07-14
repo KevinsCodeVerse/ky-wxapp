@@ -1,12 +1,13 @@
-// const baseUrl = 'http://tcgz.mtfsoft.cn/api/'; // 线上
-const baseUrl = 'http://120.77.254.156/api/'; // 线上
+// const baseUrl = 'http://120.77.254.156/api/'; // 线上
+const baseUrl = 'http://keyingapi.mtfsoft.cn/'; // 线上
 // const baseUrl = 'http://nobug-w.natapp1.cc/';  // 内网穿透
 
-// const imgUrl = 'http://tcgz.mtfsoft.cn/api/'; // 线上
-const imgUrl = 'http://120.77.254.156'; // 线上
 
-// const wsUrl = "wss://tcgz.mtfsoft.cn/api/";
-const wsUrl = "wss://120.77.254.156/api/";
+// const imgUrl = 'http://120.77.254.156'; // 线上
+const imgUrl = 'http://keyingapi.mtfsoft.cn'; // 线上
+
+// const wsUrl = "wss://120.77.254.156/api/";
+const wsUrl = "wss://keyingapi.mtfsoft.cn/";
 var fullPath = function(listener) {
 	var result = "";
 	if (listener && listener.search("files/") != -1) {

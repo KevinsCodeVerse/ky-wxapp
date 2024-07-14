@@ -58,13 +58,7 @@
 export default {
 	data() {
 		return {
-			address: {
-				id: 1, // 假设是从本地存储或请求中获取的默认地址ID
-				name: '蒋天福',
-				phone: '18676267684',
-				region: '广东省中山市小榄镇升平西路107号',
-				address: ''
-			},
+			address: {},
 			products: [],
 			carIds: [],
 			installationFee: 50,
@@ -90,6 +84,8 @@ export default {
 				}
 			];
 		}
+	},
+	onShow() {
 		this.getDeafultAddress();
 	},
 	computed: {
@@ -103,7 +99,7 @@ export default {
 	methods: {
 		getDeafultAddress() {
 			this.$request.post({
-				url: '/user/userAddress/getDefaultAddress',
+				url: 'user/userAddress/getDefaultAddress',
 				success: (res) => {
 					this.address = {
 						id: res.id,
@@ -124,15 +120,23 @@ export default {
 			};
 			if (this.carIds.length > 0) {
 				orderData.carIds = JSON.stringify(this.carIds);
+				if (!orderData.addressId) {
+					uni.showToast({
+						title: '请添加收货地址',
+						icon: 'none'
+					});
+					return;
+				}
 				console.log('orderData', orderData);
+
 				this.$request.post({
-					url: '/user/userOrder/shopCarSettlement',
+					url: 'user/userOrder/shopCarSettlement',
 					params: orderData,
 					success: (res) => {
-						uni.showToast({
-							title: '订单提交成功',
-							icon: 'success'
-						});
+						if (this.selectedPaymentMethod == 'member' && res) {
+							this.payOrder(res);
+						}
+
 						// 在此处添加提交订单成功后的逻辑
 					},
 					fail: (err) => {
@@ -150,13 +154,13 @@ export default {
 					count: this.products[0].quantity
 				};
 				this.$request.post({
-					url: '/user/userOrder/submitOrder',
+					url: 'user/userOrder/submitOrder',
 					params: orderData,
 					success: (res) => {
-						uni.showToast({
-							title: '订单提交成功',
-							icon: 'success'
-						});
+						if (this.selectedPaymentMethod == 'member' && res) {
+							this.payOrder(res);
+						}
+
 						// 在此处添加提交订单成功后的逻辑
 					},
 					fail: (err) => {
@@ -167,6 +171,26 @@ export default {
 					}
 				});
 			}
+		},
+		payOrder(orderId) {
+			this.$request.post({
+				url: 'user/userOrder/orderPay',
+				params: {
+					orderId
+				},
+				success: (res) => {
+					uni.showToast({
+						title: '订单提交成功',
+						icon: 'success'
+					});
+				},
+				fail: (err) => {
+					uni.showToast({
+						title: '订单提交失败',
+						icon: 'none'
+					});
+				}
+			});
 		}
 	}
 };

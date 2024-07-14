@@ -5,11 +5,11 @@
 		</view>
 		<view class="handle">
 			<button class="mybtn btn" open-type="getUserInfo" @tap="getUserProfile">微信授权登录</button>
-			<navigator class="mybtn btn" url="/pages/register/index">手机号登录注册</navigator>
-			<view class="protocol">
+			<!-- <navigator class="mybtn btn" url="/pages/register/index">手机号登录注册</navigator> -->
+			<!-- 			<view class="protocol">
 				<text>登录代表您已同意</text>
 				<navigator url="/pages/protocol/index">《用户协议》</navigator>
-			</view>
+			</view> -->
 		</view>
 	</view>
 </template>
@@ -78,7 +78,7 @@ export default {
 							url: 'wx/ma/user/public/login',
 							params: {
 								code: res.code,
-								phone: this.phone
+								parentId: this.parentId
 							},
 							success: (result) => {
 								uni.setStorageSync('login', result);
@@ -117,19 +117,19 @@ export default {
 		},
 		handleScanParams() {
 			console.log('parentId', this.parentId);
-			// if (this.parentId) {
-			// 	this.bindParent();
-			// }
-			// if (this.id && this.shopId) {
-			// 	this.scanCode();
-			// }
+			if (this.parentId) {
+				this.bindParent();
+			}
+			if (this.id && this.shopId) {
+				this.scanCode();
+			}
 			uni.switchTab({
 				url: '/pages/index/index'
 			});
 		},
 		bindParent() {
 			this.$request.post({
-				url: '/wx/ma/user/bind',
+				url: 'wx/ma/user/bind',
 				params: {
 					parentId: this.parentId
 				},
@@ -143,7 +143,7 @@ export default {
 		},
 		scanCode() {
 			this.$request.post({
-				url: '/user/userInfo/scanCode',
+				url: 'user/userInfo/scanCode',
 				params: {
 					id: this.id,
 					shopId: this.shopId

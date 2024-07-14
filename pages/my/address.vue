@@ -72,7 +72,7 @@ export default {
 	methods: {
 		getAddressList() {
 			this.$request.post({
-				url: '/user/userAddress/list',
+				url: 'user/userAddress/list',
 				params: this.params,
 				success: (res) => {
 					this.addresses = res.list.map((address) => {
@@ -108,7 +108,7 @@ export default {
 		},
 		updateDefaultAddress(id) {
 			this.$request.post({
-				url: '/user/userAddress/update',
+				url: 'user/userAddress/update',
 				params: {
 					id: id,
 					isDefault: 1
@@ -129,7 +129,7 @@ export default {
 		},
 		deleteAddress(row) {
 			this.$request.post({
-				url: '/user/userAddress/delete',
+				url: 'user/userAddress/delete',
 				params: {
 					ids: JSON.stringify([row.id])
 				},
@@ -151,7 +151,7 @@ export default {
 		deleteSelectedAddresses() {
 			const ids = this.addresses.filter((address) => address.isSelected).map((address) => address.id);
 			this.$request.post({
-				url: '/user/userAddress/delete',
+				url: 'user/userAddress/delete',
 				params: {
 					ids: JSON.stringify(ids)
 				},

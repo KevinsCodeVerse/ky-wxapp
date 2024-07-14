@@ -94,6 +94,9 @@ export default {
 			};
 		}
 	},
+	onShow() {
+		this.getOrderList();
+	},
 	methods: {
 		checkboxGroupChange() {
 			this.updateTotals();
@@ -122,7 +125,7 @@ export default {
 		reachBottom() {},
 		getOrderList() {
 			this.$request.post({
-				url: '/user/userShopCar/list',
+				url: 'user/userShopCar/list',
 				params: {
 					pageNo: 1,
 					pageSize: 10

@@ -16,25 +16,25 @@
 			<view class="nav">
 				<view class="top">我的订单</view>
 				<view class="gird-flex">
-					<view class="img-box">
+					<view @click="toOrder(0)" class="img-box">
 						<view class="img">
 							<u-image src="@/static/my/order.png" width="60rpx" height="60rpx"></u-image>
 						</view>
 						<view>全部订单</view>
 					</view>
-					<view class="img-box">
+					<view @click="toOrder(1)" class="img-box">
 						<view class="img">
 							<u-image src="@/static/my/obligation.png" width="60rpx" height="60rpx"></u-image>
 						</view>
 						<view>待付款</view>
 					</view>
-					<view class="img-box">
+					<view @click="toOrder(3)" class="img-box">
 						<view class="img">
 							<u-image src="@/static/my/car.png" width="60rpx" height="60rpx"></u-image>
 						</view>
 						<view>待收货</view>
 					</view>
-					<view class="img-box">
+					<view @click="toOrder(4)" class="img-box">
 						<view class="img">
 							<u-image src="@/static/my/afterSale.png" width="60rpx" height="60rpx"></u-image>
 						</view>
@@ -77,6 +77,11 @@ export default {
 
 	},
 	methods: {
+		toOrder(status){
+			uni.navigateTo({
+				url:`/pages/orderList/order?status=${status}`
+			})
+		},
 		openPage(path) {
 			this.$u.route({
 				url: path

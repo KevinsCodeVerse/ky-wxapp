@@ -13,15 +13,12 @@
 						</view>
 					</view>
 				</view>
-
 				<!-- 商品列表 -->
 				<view class="product-list" v-if="products.length > 0">
 					<view class="product-item" v-for="(product, index) in products" :key="index">
 						<image class="product-image" :src="$comm.fullPath(product.cover)" mode="aspectFit"></image>
-
 						<view class="product-info">
 							<text class="product-name">{{ product.name }}</text>
-
 							<view class="product-price">￥{{ product.price }}</view>
 							<view class="flex-box">
 								<view class="">
@@ -43,6 +40,7 @@ export default {
 		return {
 			infoId: null,
 			pId: null,
+			shopId: null,
 			subCategories: [],
 			products: []
 		};
@@ -50,13 +48,14 @@ export default {
 	onLoad(options) {
 		this.infoId = options.infoId;
 		this.pId = options.pId;
+		this.shopId = options.shopId;
 		this.getCategories(this.pId);
 		this.getProductsByCategory(this.pId);
 	},
 	methods: {
 		getCategories(pId) {
 			this.$request.post({
-				url: '/user/userInfo/indexCategoryList',
+				url: 'user/userInfo/indexCategoryList',
 				params: {
 					infoId: this.infoId,
 					pId: pId
@@ -75,10 +74,10 @@ export default {
 		},
 		getProductsByCategory(cId) {
 			this.$request.post({
-				url: '/user/userInfo/indexProListByCategory',
+				url: 'user/userInfo/indexProListByCategory',
 				params: {
 					cId: cId,
-					shopId: this.infoId
+					shopId: this.shopId
 				},
 				success: (res) => {
 					if (res.length > 0) {
@@ -93,8 +92,24 @@ export default {
 			});
 		},
 		loadSubCategoryOrProducts(item) {
-			uni.navigateTo({
-				url: `/pages/classifications/classDetail?infoId=${this.infoId}&pId=${item.id}`
+			this.$request.post({
+				url: 'user/userInfo/indexCategoryList',
+				params: {
+					infoId: this.infoId,
+					pId: item.id
+				},
+				success: (res) => {
+					if (res.length > 0) {
+						uni.navigateTo({
+							url: `/pages/classifications/classDetail?infoId=${this.infoId}&pId=${item.id}&shopId=${this.shopId}`
+						});
+					} else {
+						uni.showToast({
+							icon: 'none',
+							title: '没有更多分类'
+						});
+					}
+				}
 			});
 		}
 	}
@@ -104,9 +119,6 @@ export default {
 <style lang="scss" scoped>
 .u-wrap {
 	height: calc(100vh);
-	/* #ifdef H5 */
-	height: calc(100vh - var(--window-top));
-	/* #endif */
 	display: flex;
 	flex-direction: column;
 }
@@ -184,7 +196,6 @@ export default {
 
 .product-info {
 	display: flex;
-	flex-direction: column;
 	flex-direction: column;
 }
 

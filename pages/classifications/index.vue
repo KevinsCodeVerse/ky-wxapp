@@ -19,15 +19,12 @@
 							</view>
 						</view>
 					</view>
-
 					<!-- 商品列表 -->
 					<view class="product-list" v-if="products.length > 0">
-						<view class="product-item" v-for="(product, index) in products" :key="index">
+						<view class="product-item" v-for="(product, index) in products" :key="index" @click="goToDetail(product.id)">
 							<image class="product-image" :src="$comm.fullPath(product.cover)" mode="aspectFit"></image>
-
 							<view class="product-info">
 								<text class="product-name">{{ product.name }}</text>
-
 								<view class="product-price">￥{{ product.price }}</view>
 								<view class="flex-box">
 									<view class="">
@@ -48,51 +45,55 @@
 export default {
 	data() {
 		return {
-			scrollTop: 0, //tab标题的滚动条位置
+			scrollTop: 0,
 			oldScrollTop: 0,
-			current: 0, // 预设当前项的值
-			menuHeight: 0, // 左边菜单的高度
-			menuItemHeight: 0, // 左边菜单item的高度
-			itemId: '', // 栏目右边scroll-view用于滚动的id
-			categories: [], // 一级分类数据
-			subCategories: [], // 当前显示的子分类数据
+			current: 0,
+			menuHeight: 0,
+			menuItemHeight: 0,
+			itemId: '',
+			categories: [],
+			subCategories: [],
 			menuItemPos: [],
 			arr: [],
-			scrollRightTop: 0, // 右边栏目scroll-view的滚动条高度
-			timer: null, // 定时器
-			currentPId: -1, // 当前分类的父ID
-			isLoading: false, // 防止重复请求的标志
-			shopId: 8, // 商家ID，假设为8
-			products: [], // 当前显示的商品列表
-			categoryStack: [] // 分类堆栈
+			scrollRightTop: 0,
+			timer: null,
+			currentPId: -1,
+			isLoading: false,
+			shopId: '',
+			products: [],
+			categoryStack: []
 		};
 	},
 	onLoad() {
 		this.getShopId();
 	},
 	methods: {
+		goToDetail(e) {
+			uni.navigateTo({
+				url: `/pages/shop/detail?id=${e}`
+			});
+		},
 		getShopId() {
 			this.$request.post({
-				url: '/user/userInfo/bindTenant',
+				url: 'user/userInfo/bindTenant',
 				success: (res) => {
 					this.shopId = res[0].shopId;
 					this.infoId = res[0].tenantId;
-					this.getCategoriesAndDefaultSubCategories(-1); // 获取一级分类并默认选中第一个
-					this.categoryStack.push(-1); // 初始分类ID
+					this.getCategoriesAndDefaultSubCategories(-1);
+					this.categoryStack.push(-1);
 				},
 				fail: () => {
 					this.isLoading = false;
 				}
 			});
 		},
-		// 获取一级分类和默认二级分类数据
 		getCategoriesAndDefaultSubCategories(pId) {
-			if (this.isLoading) return; // 防止重复请求
+			if (this.isLoading) return;
 			this.isLoading = true;
 			this.$request.post({
-				url: '/user/userInfo/indexCategoryList',
+				url: 'user/userInfo/indexCategoryList',
 				params: {
-					infoId: this.infoId, // 商家ID
+					infoId: this.infoId,
 					pId: pId
 				},
 				success: (res) => {
@@ -103,14 +104,14 @@ export default {
 						});
 					} else {
 						if (pId === -1) {
-							this.categories = res; // 设置一级分类
+							this.categories = res;
 							if (this.categories.length > 0) {
 								this.currentPId = this.categories[0].id;
-								this.getCategoriesAndProducts(this.currentPId); // 默认加载第一个分类的子分类和商品
+								this.getCategoriesAndProducts(this.currentPId);
 								this.getProductsByCategory(this.currentPId);
 							}
 						} else {
-							this.subCategories = res; // 设置子分类
+							this.subCategories = res;
 							this.checkForProductsOrSubCategories();
 						}
 					}
@@ -124,12 +125,11 @@ export default {
 				}
 			});
 		},
-		// 获取分类和商品数据
 		getCategoriesAndProducts(pId) {
 			this.$request.post({
-				url: '/user/userInfo/indexCategoryList',
+				url: 'user/userInfo/indexCategoryList',
 				params: {
-					infoId: this.infoId, // 商家ID
+					infoId: this.infoId,
 					pId: pId
 				},
 				success: (res) => {
@@ -139,7 +139,7 @@ export default {
 							title: '没有更多分类了'
 						});
 					} else {
-						this.subCategories = res; // 设置子分类
+						this.subCategories = res;
 						this.checkForProductsOrSubCategories();
 					}
 				},
@@ -148,13 +148,12 @@ export default {
 				}
 			});
 		},
-		// 获取商品列表数据
 		getProductsByCategory(cId) {
 			this.$request.post({
-				url: '/user/userInfo/indexProListByCategory',
+				url: 'user/userInfo/indexProListByCategory',
 				params: {
-					cId: cId, // 商品分类ID
-					shopId: this.shopId // 上架ID
+					cId: cId,
+					shopId: this.shopId
 				},
 				success: (res) => {
 					if (res.length === 0) {
@@ -163,7 +162,7 @@ export default {
 							title: '没有更多商品了'
 						});
 					} else {
-						this.products = res; // 设置商品列表
+						this.products = res;
 					}
 				},
 				fail: () => {
@@ -174,7 +173,6 @@ export default {
 				}
 			});
 		},
-		// 检查是否有子分类或商品
 		checkForProductsOrSubCategories() {
 			if (this.subCategories.length === 0 && this.products.length === 0) {
 				uni.showToast({
@@ -183,7 +181,6 @@ export default {
 				});
 			}
 		},
-		// 点击左边的栏目切换
 		swichMenu(index) {
 			this.current = index;
 			this.currentPId = this.categories[index].id;
@@ -192,7 +189,6 @@ export default {
 			this.getProductsByCategory(this.currentPId);
 			this.scrollTop = index * this.menuItemHeight + this.menuItemHeight / 2 - this.menuHeight / 2;
 		},
-		// 获取一个目标元素的高度
 		getElRect(elClass, dataVal) {
 			return new Promise((resolve, reject) => {
 				const query = uni.createSelectorQuery().in(this);
@@ -203,7 +199,6 @@ export default {
 							size: true
 						},
 						(res) => {
-							// 如果节点尚未生成，res值为null，循环调用执行
 							if (!res) {
 								setTimeout(() => {
 									this.getElRect(elClass, dataVal);
@@ -217,12 +212,9 @@ export default {
 					.exec();
 			});
 		},
-		// 观测元素相交状态
 		observer() {
 			this.subCategories.map((val, index) => {
 				let observer = uni.createIntersectionObserver(this);
-				// 检测右边scroll-view的id为itemxx的元素与right-box的相交状态
-				// 如果跟.right-box底部相交，就动态设置左边栏目的活动状态
 				observer
 					.relativeTo('.right-box', {
 						top: 0
@@ -235,25 +227,20 @@ export default {
 					});
 			});
 		},
-		// 设置左边菜单的滚动状态
 		leftMenuStatus(index) {
 			this.current = index;
-			// 如果为0，意味着尚未初始化
 			if (this.menuHeight == 0 || this.menuItemHeight == 0) {
 				this.getElRect('menu-scroll-view', 'menuHeight');
 				this.getElRect('u-tab-item', 'menuItemHeight');
 			}
-			// 将菜单活动item垂直居中
 			this.scrollTop = index * this.menuItemHeight + this.menuItemHeight / 2 - this.menuHeight / 2;
 		},
-		// 获取右边菜单每个item到顶部的距离
 		getMenuItemTop() {
 			return new Promise((resolve) => {
 				let selectorQuery = uni.createSelectorQuery();
 				selectorQuery
 					.selectAll('.class-item')
 					.boundingClientRect((rects) => {
-						// 如果节点尚未生成，rects值为[](因为用selectAll，所以返回的是数组)，循环调用执行
 						if (!rects.length) {
 							setTimeout(() => {
 								this.getMenuItemTop();
@@ -261,7 +248,6 @@ export default {
 							return;
 						}
 						rects.forEach((rect) => {
-							// 这里减去rects[0].top，是因为第一项顶部可能不是贴到导航栏(比如有个搜索框的情况)
 							this.arr.push(rect.top - rects[0].top);
 							resolve();
 						});
@@ -269,7 +255,6 @@ export default {
 					.exec();
 			});
 		},
-		// 右边菜单滚动
 		rightScroll(e) {
 			this.oldScrollTop = e.detail.scrollTop;
 			if (this.arr.length == 0) {
@@ -280,14 +265,11 @@ export default {
 				this.getElRect('menu-scroll-view', 'menuHeight');
 			}
 			setTimeout(() => {
-				// 节流
 				this.timer = null;
-				// scrollHeight为右边菜单垂直中点位置
 				let scrollHeight = e.detail.scrollTop + this.menuHeight / 2;
 				for (let i = 0; i < this.arr.length; i++) {
 					let height1 = this.arr[i];
 					let height2 = this.arr[i + 1];
-					// 如果不存在height2，意味着数据循环已经到了最后一个，设置左边菜单为最后一项即可
 					if (!height2 || (scrollHeight >= height1 && scrollHeight < height2)) {
 						this.leftMenuStatus(i);
 						return;
@@ -295,20 +277,34 @@ export default {
 				}
 			}, 10);
 		},
-		// 加载下一级分类或商品列表
 		toloadSubCategoryOrProducts(item) {
-			uni.navigateTo({
-				url: `/pages/classifications/classDeatil?infoId=${this.infoId}&pId=${item.id}`
+			this.$request.post({
+				url: 'user/userInfo/indexCategoryList',
+				params: {
+					infoId: this.infoId,
+					pId: item.id
+				},
+				success: (res) => {
+					if (res.length == 0) {
+						uni.showToast({
+							icon: 'none',
+							title: '没有更多分类'
+						});
+					} else {
+						uni.navigateTo({
+							url: `/pages/classifications/classDetail?infoId=${this.infoId}&pId=${item.id}&shopId=${this.shopId}`
+						});
+					}
+				}
 			});
 		},
 		loadSubCategoryOrProducts(item) {
-			this.categoryStack.push(item.id); // 将当前分类ID入栈
+			this.categoryStack.push(item.id);
 			this.getCategoriesAndProducts(item.id);
 			this.getProductsByCategory(item.id);
 		},
-		// 返回上一级分类
 		goBack() {
-			this.categoryStack.pop(); // 从堆栈中弹出当前分类ID
+			this.categoryStack.pop();
 			const previousCategoryId = this.categoryStack[this.categoryStack.length - 1];
 			this.getCategoriesAndProducts(previousCategoryId);
 			this.getProductsByCategory(previousCategoryId);
@@ -320,9 +316,6 @@ export default {
 <style lang="scss" scoped>
 .u-wrap {
 	height: calc(100vh);
-	/* #ifdef H5 */
-	height: calc(100vh - var(--window-top));
-	/* #endif */
 	display: flex;
 	flex-direction: column;
 }
@@ -374,15 +367,6 @@ export default {
 
 .page-view {
 	padding: 16rpx;
-}
-
-.back-button {
-	font-size: 26rpx;
-	color: #002fa7;
-	font-weight: bold;
-	float: right;
-	margin-bottom: 20rpx;
-	cursor: pointer;
 }
 
 .category-list {
@@ -448,7 +432,6 @@ export default {
 
 .product-info {
 	display: flex;
-	flex-direction: column;
 	flex-direction: column;
 }
 

@@ -51,7 +51,6 @@
 				<view class="vmb-warter" v-for="(item, index) in list" :key="item.id" @click="goToDetail(item.id)">
 					<view class="vmb-img-wrap">
 						<image class="vmb-image" :src="$comm.fullPath(item.cover)" mode="aspectFill"></image>
-
 						<view class="img-text">会员最高省{{ item.vipPro }}元</view>
 					</view>
 					<view style="padding: 0 8rpx">
@@ -68,7 +67,6 @@
 		</view>
 	</view>
 </template>
-
 <script>
 export default {
 	data() {
@@ -88,19 +86,9 @@ export default {
 				pageSize: 10 // 设定每次加载的条目数
 			},
 			shop: {},
-			swiperList: [
-				{
-					image: require('../../static/index/swiper_1.jpg')
-				},
-				{
-					image: require('../../static/index/swiper_1.jpg')
-				},
-				{
-					image: require('../../static/index/swiper_1.jpg')
-				}
-			],
 			loadStatus: 'loadmore',
-			list: []
+			list: [],
+			total: 0 // 总数据条目数
 		};
 	},
 	onLoad() {
@@ -108,7 +96,7 @@ export default {
 	},
 
 	onReachBottom() {
-		if (this.loadStatus !== 'loading') {
+		if (this.loadStatus !== 'loading' && this.loadStatus !== 'nomore') {
 			this.loadStatus = 'loading';
 			this.onLoadMore();
 		}
@@ -210,6 +198,12 @@ export default {
 				success: (res) => {
 					console.log('商家列表res', res);
 					this.list = res.list;
+					this.total = res.total;
+					if (this.list.length >= this.total) {
+						this.loadStatus = 'nomore';
+					} else {
+						this.loadStatus = 'loadmore';
+					}
 				}
 			});
 		},
@@ -220,6 +214,10 @@ export default {
 			});
 		},
 		onLoadMore() {
+			if (this.list.length >= this.total) {
+				this.loadStatus = 'nomore';
+				return;
+			}
 			this.params.pageNo += 1;
 			this.$request.post({
 				url: 'user/userInfo/indexProList',
@@ -228,7 +226,11 @@ export default {
 					console.log('更多商品列表res', res);
 					if (res.list && res.list.length > 0) {
 						this.list = [...this.list, ...res.list];
-						this.loadStatus = 'loadmore';
+						if (this.list.length >= this.total) {
+							this.loadStatus = 'nomore';
+						} else {
+							this.loadStatus = 'loadmore';
+						}
 					} else {
 						this.loadStatus = 'nomore';
 					}

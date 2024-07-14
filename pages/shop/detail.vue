@@ -171,7 +171,7 @@ export default {
 	methods: {
 		getShopDetail(id) {
 			this.$request.post({
-				url: '/user/userShopCar/proDetail',
+				url: 'user/userShopCar/proDetail',
 				params: {
 					proId: id
 				},
@@ -233,7 +233,7 @@ export default {
 			console.log('pro', this.pro);
 			console.log('this.popupData.currentSku.id', this.popupData.currentSku.id);
 			this.$request.post({
-				url: '/user/userShopCar/addShopCar',
+				url: 'user/userShopCar/addShopCar',
 				params: {
 					proId: this.pro.id,
 					skuId: this.popupData.currentSku.id
@@ -259,7 +259,7 @@ export default {
 		},
 		editCart() {
 			this.$request.post({
-				url: '/user/userShopCar/editShopCar',
+				url: 'user/userShopCar/editShopCar',
 				params: {
 					id: this.addedCartId,
 					count: this.popupData.quantity
