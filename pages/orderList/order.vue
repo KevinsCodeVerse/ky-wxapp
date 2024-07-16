@@ -148,7 +148,8 @@ export default {
 				case 0:
 					return ['取消订单', '支付订单'];
 				case 1:
-					return ['订单详情', '取消订单'];
+					// return ['订单详情', '取消订单'];
+					return ['订单详情'];
 				case 2:
 					return ['订单详情', '确认收货'];
 				case 3:
@@ -179,58 +180,61 @@ export default {
 		handleButtonClick(button, order) {
 			switch (button) {
 				case '取消订单':
-					this.cancelOrder(order.orderId);
+					this.cancelOrder(order);
 					break;
 				case '支付订单':
-					this.payOrder(order.orderId);
+					this.payOrder(order);
 					break;
 				case '订单详情':
-					this.goToOrderDetail(order.orderId);
+					this.goToOrderDetail(order);
 					break;
 				case '确认收货':
-					this.confirmReceipt(order.orderId);
+					this.confirmReceipt(order);
 					break;
 				case '申请售后':
-					this.requestAfterSale(order.orderId);
+					this.requestAfterSale(order);
 					break;
 				case '再来一单':
-					this.reorder(order.orderId);
+					this.reorder(order);
 					break;
 				case '撤回申请':
-					this.withdrawRequest(order.orderId);
+					this.withdrawRequest(order);
 					break;
 				default:
 					break;
 			}
 		},
-		cancelOrder(orderId) {
-			console.log('取消订单', orderId);
+		cancelOrder(item) {
+			console.log('取消订单', item);
 			// 这里添加取消订单的逻辑
 		},
-		payOrder(orderId) {
-			console.log('支付订单', orderId);
+		payOrder(item) {
+			console.log('支付订单', item);
 			// 这里添加支付订单的逻辑
 		},
-		goToOrderDetail(orderId) {
-			console.log('订单详情', orderId);
+		goToOrderDetail(item) {
+			console.log('订单详情', item);
 			uni.navigateTo({
-				url: `/pages/orderList/orderDetail?orderId=${orderId}`
+				url: `/pages/orderList/orderDetail?orderId=${item.orderId}`
 			});
 		},
-		confirmReceipt(orderId) {
-			console.log('确认收货', orderId);
+		confirmReceipt(item) {
+			console.log('确认收货', item);
 			// 这里添加确认收货的逻辑
 		},
-		requestAfterSale(orderId) {
-			console.log('申请售后', orderId);
+		requestAfterSale(item) {
+			console.log('申请售后', item);
 			// 这里添加申请售后的逻辑
 		},
-		reorder(orderId) {
-			console.log('再来一单', orderId);
+		reorder(item) {
 			// 这里添加再来一单的逻辑
+			console.log('再来一单', item.userOrderPayList[0].proId);
+			uni.navigateTo({
+				url: `/pages/shop/detail?id=${item.userOrderPayList[0].proId}`
+			});
 		},
-		withdrawRequest(orderId) {
-			console.log('撤回申请', orderId);
+		withdrawRequest(item) {
+			console.log('撤回申请', item);
 			// 这里添加撤回申请的逻辑
 		},
 		formatSpecName(specName) {
@@ -256,10 +260,9 @@ export default {
 }
 .orders-list {
 	flex: 1;
-	padding: 20rpx;
 }
 .order-item {
-	margin-bottom: 20rpx;
+	margin: 15rpx 20rpx;
 	padding: 20rpx;
 	background-color: #fff;
 	border-radius: 16rpx;

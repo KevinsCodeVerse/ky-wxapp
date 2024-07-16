@@ -1,15 +1,22 @@
 <template>
 	<view class="page">
-		<view class="header">
-			<view class="title">确认下单</view>
-		</view>
 		<scroll-view class="content" scroll-y="true">
 			<!-- 收件人信息 -->
-			<view class="address-info">
-				<view class="address-item">
-					<view class="name-phone">{{ address.name }} {{ address.phone }}</view>
-					<view class="address">{{ address.address }}</view>
+			<view class="address-box">
+				<view class="address-info">
+					<view v-if="address.name" class="address-item">
+						<u-icon size="40rpx" class="icon" name="map" color="#3c3c3c"></u-icon>
+						<view class="address-details">
+							<view class="name-phone">{{ address.name }} {{ address.phone }}</view>
+							<view class="address">{{ address.address }}</view>
+						</view>
+					</view>
+					<view v-else class="address-item">
+						<u-icon color="#3c3c3c" size="40rpx" class="icon" name="map"></u-icon>
+						<view class="add-address">+添加收货地址</view>
+					</view>
 				</view>
+				<image class="address-line" src="@/static/index/address-line.png" mode="widthFix"></image>
 			</view>
 
 			<!-- 商品信息 -->
@@ -28,19 +35,19 @@
 			<!-- 费用信息 -->
 			<view class="fee-info">
 				<view class="fee-item">
-					<view class="fee-label">快递费</view>
-					<view class="fee-value">包邮</view>
-				</view>
-				<view class="fee-item">
-					<view class="fee-label">安装费</view>
-					<view class="fee-value">￥{{ installationFee }}</view>
+					<view class="fee-label">合计</view>
+					<view class="fee-value">￥{{ totalPrice }}</view>
 				</view>
 			</view>
 
 			<!-- 支付方式 -->
 			<view class="payment-method">
 				<view class="payment-item" v-for="method in paymentMethods" :key="method.value" @click="selectPaymentMethod(method.value)">
-					<view class="payment-label">{{ method.label }}</view>
+					<view class="payment-flex">
+						<image :src="method.icon" class="icon" mode="widthFix" />
+						<view class="payment-label">{{ method.label }}</view>
+					</view>
+
 					<radio :checked="selectedPaymentMethod === method.value" color="#002FA7"></radio>
 				</view>
 			</view>
@@ -48,8 +55,11 @@
 
 		<!-- 底部 -->
 		<view class="footer">
-			<view class="total-price">￥{{ totalPrice }}</view>
-			<button class="submit-order" @click="submitOrder">提交订单</button>
+			<view class="left">
+				<span class="total-price-label">应付:</span>
+				<span class="total-price-value">￥{{ totalPrice }}</span>
+			</view>
+			<button :class="{ 'submit-order': true, 'submit-order-disabled': !address.name }" @click="submitOrder" :disabled="!address.name">提交订单</button>
 		</view>
 	</view>
 </template>
@@ -61,10 +71,9 @@ export default {
 			address: {},
 			products: [],
 			carIds: [],
-			installationFee: 50,
 			paymentMethods: [
-				{ label: '会员账户', value: 'member' },
-				{ label: '线下购买', value: 'offline' }
+				{ label: '会员账户', value: 'member', icon: require('@/static/index/vip-icon.png') },
+				{ label: '线下购买', value: 'offline', icon: require('@/static/index/shop-icon.png') }
 			],
 			selectedPaymentMethod: 'member'
 		};
@@ -86,18 +95,18 @@ export default {
 		}
 	},
 	onShow() {
-		this.getDeafultAddress();
+		this.getDefaultAddress();
 	},
 	computed: {
 		totalPrice() {
 			let productTotal = this.products.reduce((total, item) => {
 				return total + item.sku.curPrice * item.quantity;
 			}, 0);
-			return (productTotal + this.installationFee).toFixed(2);
+			return productTotal.toFixed(2);
 		}
 	},
 	methods: {
-		getDeafultAddress() {
+		getDefaultAddress() {
 			this.$request.post({
 				url: 'user/userAddress/getDefaultAddress',
 				success: (res) => {
@@ -127,8 +136,6 @@ export default {
 					});
 					return;
 				}
-				console.log('orderData', orderData);
-
 				this.$request.post({
 					url: 'user/userOrder/shopCarSettlement',
 					params: orderData,
@@ -199,45 +206,130 @@ export default {
 <style lang="scss" scoped>
 .page {
 	background-color: #f5f5f5;
-}
-.header {
 	padding: 20rpx;
-	background-color: #fff;
-	text-align: center;
-	font-size: 36rpx;
-	font-weight: bold;
 }
+
 .content {
-	padding: 20rpx;
 }
-.address-info,
-.product-info,
-.fee-info,
+.address-box {
+	background-color: #fff;
+	border-radius: 10rpx;
+	margin: 20rpx 0;
+}
+.address-info {
+	background-color: #fff;
+	padding: 20rpx 0;
+	display: flex;
+	align-items: center;
+}
+.address-item {
+	display: flex;
+	align-items: center;
+	width: 100%;
+}
+.address-details {
+	flex: 1;
+	margin-left: 10rpx;
+}
+.name-phone {
+	font-weight: bold;
+	font-size: 30rpx;
+	margin-bottom: 10rpx;
+}
+.address {
+	color: #666;
+}
+.add-address {
+	color: #002fa7;
+	font-size: 30rpx;
+}
+.address-line {
+	width: 100%;
+	height: 4rpx;
+}
+.product-info {
+	background-color: #fff;
+	padding: 20rpx;
+	border-radius: 10rpx;
+	border-bottom: 2rpx solid #f5f5f5;
+}
+
+.product-item {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 10rpx;
+}
+.product-image {
+	width: 150rpx;
+	height: 150rpx;
+	border-radius: 12rpx;
+}
+.product-details {
+	flex: 1;
+	margin-left: 20rpx;
+}
+.product-name {
+	font-weight: bold;
+	font-size: 30rpx;
+	margin-bottom: 10rpx;
+}
+.product-spec {
+	color: #666;
+	font-size: 26rpx;
+	margin-bottom: 5rpx;
+}
+.product-price {
+	font-weight: bold;
+	font-size: 28rpx;
+	color: #222;
+}
+.product-quantity {
+	font-size: 30rpx;
+	color: #222;
+}
+.fee-info {
+	margin-bottom: 20rpx;
+	background-color: #fff;
+	padding: 20rpx;
+	border-radius: 10rpx;
+}
+.fee-item {
+	display: flex;
+	justify-content: space-between;
+	margin-bottom: 10rpx;
+}
+.fee-label {
+	font-size: 28rpx;
+	color: #666;
+}
+.fee-value {
+	font-size: 28rpx;
+	color: #222;
+}
+.payment-flex {
+	display: flex;
+}
 .payment-method {
 	margin-bottom: 20rpx;
 	background-color: #fff;
 	padding: 20rpx;
 	border-radius: 10rpx;
 }
-.address-item,
-.product-item,
-.fee-item,
 .payment-item {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	margin-bottom: 10rpx;
+	margin: 20rpx 0;
+	height: 50rpx;
+	.icon {
+		width: 34rpx;
+		height: 34rpx;
+		margin-right: 10rpx;
+	}
 }
-.product-item {
-	flex-direction: row;
-}
-.product-image {
-	width: 100rpx;
-	height: 100rpx;
-}
-.product-details {
-	flex: 1;
-	margin-left: 20rpx;
+.payment-label {
+	font-size: 28rpx;
+	color: #222;
 }
 .footer {
 	display: flex;
@@ -249,10 +341,18 @@ export default {
 	bottom: 0;
 	width: 100%;
 	box-shadow: 0 -2rpx 8rpx rgba(0, 0, 0, 0.1);
+	.left {
+		flex: 1;
+	}
 }
-.total-price {
+.total-price-label {
+	font-size: 30rpx;
+	color: #666;
+}
+.total-price-value {
 	font-size: 36rpx;
 	font-weight: bold;
+	color: #222;
 }
 .submit-order {
 	width: 200rpx;
@@ -263,5 +363,8 @@ export default {
 	text-align: center;
 	line-height: 60rpx;
 	border-radius: 30rpx;
+}
+.submit-order-disabled {
+	background-color: #ccc;
 }
 </style>

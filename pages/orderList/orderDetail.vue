@@ -49,7 +49,7 @@
 		<view class="order-footer">
 			<view>实付: ￥{{ orderDetail.payAmount }}</view>
 			<view>
-				<button v-for="(button, index) in getButtons(orderDetail.status)" :key="index" :class="button.class" @click="handleAction(button.action)">
+				<button v-for="(button, index) in getButtons(orderDetail.status)" :key="index" :class="button.class" @click="handleAction(button.action, orderDetail)">
 					{{ button.text }}
 				</button>
 			</view>
@@ -177,51 +177,58 @@ export default {
 					return [];
 			}
 		},
-		handleAction(action) {
+		handleAction(action, item) {
 			switch (action) {
 				case 'cancel':
-					this.cancelOrder();
+					this.cancelOrder(item);
 					break;
 				case 'pay':
-					this.payOrder();
+					this.payOrder(item);
 					break;
 				case 'viewLogistics':
-					this.viewLogistics();
+					this.viewLogistics(item);
 					break;
 				case 'confirmReceipt':
-					this.confirmReceipt();
+					this.confirmReceipt(item);
 					break;
 				case 'applyAfterSale':
-					this.applyAfterSale();
+					this.applyAfterSale(item);
 					break;
 				case 'applyReturn':
-					this.applyReturn();
+					this.applyReturn(item);
 					break;
 				case 'reorder':
-					this.reorder();
+					this.reorder(item);
 					break;
 			}
 		},
-		cancelOrder() {
-			// Cancel order logic
+		cancelOrder(item) {
+			// Cancel order logic with item parameter
+			console.log('Cancel order', item);
 		},
-		payOrder() {
-			// Pay order logic
+		payOrder(item) {
+			// Pay order logic with item parameter
+			console.log('Pay order', item);
 		},
-		viewLogistics() {
-			// View logistics logic
+		viewLogistics(item) {
+			// View logistics logic with item parameter
+			console.log('View logistics', item);
 		},
-		confirmReceipt() {
-			// Confirm receipt logic
+		confirmReceipt(item) {
+			// Confirm receipt logic with item parameter
+			console.log('Confirm receipt', item);
 		},
-		applyAfterSale() {
-			// Apply after sale logic
+		applyAfterSale(item) {
+			// Apply after sale logic with item parameter
+			console.log('Apply after sale', item);
 		},
-		applyReturn() {
-			// Apply return logic
+		applyReturn(item) {
+			// Apply return logic with item parameter
+			console.log('Apply return', item);
 		},
-		reorder() {
-			// Reorder logic
+		reorder(item) {
+			// Reorder logic with item parameter
+			console.log('Reorder', item);
 		},
 		copyOrderId() {
 			uni.setClipboardData({
