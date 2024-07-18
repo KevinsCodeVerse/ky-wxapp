@@ -2,39 +2,42 @@
 	<view class="container">
 		<u-tabs inactive-color="#999" active-color="#2E3033" :show-bar="false" :list="tabs" :current="currentTab" @change="switchTab"></u-tabs>
 		<scroll-view class="orders-list" scroll-y :scroll-with-animation="true" @scrolltolower="loadMoreOrders">
-			<view v-for="(order, index) in orders" :key="index" class="order-item">
-				<view class="order-header">
-					<view class="order-number">
-						<image class="icon" src="../../static/my/order-icon.png" mode="aspectFill"></image>
-						订单编号:{{ order.orderId }}
+			<view v-if="orders.length">
+				<view v-for="(order, index) in orders" :key="index" class="order-item">
+					<view class="order-header">
+						<view class="order-number">
+							<image class="icon" src="../../static/my/order-icon.png" mode="aspectFill"></image>
+							订单编号:{{ order.orderId }}
+						</view>
+						<view :class="['order-status', getStatusClass(order.status)]">{{ getStatus(order.status) }}</view>
 					</view>
-					<view :class="['order-status', getStatusClass(order.status)]">{{ getStatus(order.status) }}</view>
-				</view>
-				<view v-for="item in order.userOrderPayList" :key="item.id" class="order-content">
-					<image class="order-image" :src="$comm.fullPath(JSON.parse(item.proInfo).avatar)" mode="aspectFill"></image>
-					<view class="order-details">
-						<view class="order-name u-line-2">{{ JSON.parse(item.proInfo).title }}</view>
-						<view class="order-spec">{{ formatSpecName(JSON.parse(item.proInfo).specName) }}</view>
-						<view class="order-price">￥{{ item.price }}</view>
+					<view v-for="item in order.userOrderPayList" :key="item.id" class="order-content">
+						<image class="order-image" :src="$comm.fullPath(JSON.parse(item.proInfo).avatar)" mode="aspectFill"></image>
+						<view class="order-details">
+							<view class="order-name u-line-2">{{ JSON.parse(item.proInfo).title }}</view>
+							<view class="order-spec">{{ formatSpecName(JSON.parse(item.proInfo).specName) }}</view>
+							<view class="order-price">￥{{ item.price }}</view>
+						</view>
+						<view class="order-count">x{{ item.count }}</view>
 					</view>
-					<view class="order-count">x{{ item.count }}</view>
-				</view>
-				<view class="order-line"></view>
-				<view class="order-footer">
-					<view class="order-total">实付: ￥{{ order.payAmount }}</view>
-					<view class="order-actions">
-						<button
-							v-for="(button, index) in getButtons(order.status)"
-							:key="index"
-							:class="['order-button', getButtonClass(button)]"
-							@click="handleButtonClick(button, order)"
-						>
-							{{ button }}
-						</button>
+					<view class="order-line"></view>
+					<view class="order-footer">
+						<view class="order-total">实付: ￥{{ order.payAmount }}</view>
+						<view class="order-actions">
+							<button
+								v-for="(button, index) in getButtons(order.status)"
+								:key="index"
+								:class="['order-button', getButtonClass(button)]"
+								@click="handleButtonClick(button, order)"
+							>
+								{{ button }}
+							</button>
+						</view>
 					</view>
 				</view>
+				<view v-if="!hasMore" class="no-more">没有更多了</view>
 			</view>
-			<view v-if="!hasMore" class="no-more">没有更多了</view>
+			<u-empty v-else icon-size="550rpx" src="../../../static/index/noEmty.png" text=" " class="center-empty"></u-empty>
 		</scroll-view>
 	</view>
 </template>
@@ -416,5 +419,12 @@ export default {
 	text-align: center;
 	color: #999;
 	margin-top: 20rpx;
+}
+.center-empty {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: calc(100vh - 114rpx);
 }
 </style>

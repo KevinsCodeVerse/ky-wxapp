@@ -8,38 +8,41 @@
 			</view>
 		</view>
 		<scroll-view class="address-list" scroll-y="true">
-			<block v-for="(address, index) in addresses" :key="index">
-				<view class="address-item" @click="isManage ? selectAddress(index) : null">
-					<view v-if="isManage" class="select-checkbox">
-						<u-checkbox v-model="address.isSelected" shape="circle" active-color="#002FA7" />
-					</view>
-					<view class="address-content">
-						<view class="address-top">
-							<view>
-								<span class="name">{{ address.name }}</span>
-								<span class="phone">{{ address.phone }}</span>
-							</view>
+			<block v-if="addresses.length">
+				<block v-for="(address, index) in addresses" :key="index">
+					<view class="address-item" @click="isManage ? selectAddress(index) : null">
+						<view v-if="isManage" class="select-checkbox">
+							<u-checkbox v-model="address.isSelected" shape="circle" active-color="#002FA7" />
 						</view>
-						<view class="address-bottom">
-							<view class="address-box">
-								<view class="address">{{ address.address }}</view>
-								<u-icon @click="editAddress(address)" v-if="!isManage" name="arrow-right" size="32rpx"></u-icon>
-							</view>
-							<view v-if="!isManage" class="line"></view>
-							<view v-if="!isManage" class="set-default">
-								<view class="left" @click.stop="selectDefaultAddress(index)">
-									<radio color="#002FA7" :checked="address.isDefault" />
-									<text class="default">设为默认地址</text>
+						<view class="address-content">
+							<view class="address-top">
+								<view>
+									<span class="name">{{ address.name }}</span>
+									<span class="phone">{{ address.phone }}</span>
 								</view>
-								<view class="delete" @click.stop="deleteAddress(address)">删除</view>
+							</view>
+							<view class="address-bottom">
+								<view class="address-box">
+									<view class="address">{{ address.address }}</view>
+									<u-icon @click="editAddress(address)" v-if="!isManage" name="arrow-right" size="32rpx"></u-icon>
+								</view>
+								<view v-if="!isManage" class="line"></view>
+								<view v-if="!isManage" class="set-default">
+									<view class="left" @click.stop="selectDefaultAddress(index)">
+										<radio color="#002FA7" :checked="address.isDefault" />
+										<text class="default">设为默认地址</text>
+									</view>
+									<view class="delete" @click.stop="deleteAddress(address)">删除</view>
+								</view>
 							</view>
 						</view>
 					</view>
-				</view>
+				</block>
 			</block>
+			<u-empty v-else icon-size="550rpx" src="../../../static/index/noEmty.png" text=" " class="center-empty"></u-empty>
 		</scroll-view>
 		<view @click="isManage ? deleteSelectedAddresses() : addAddress()">
-			<button :class="['add-address', isManage && hasSelected ? 'delete-address' : '']" :disabled="isManage && !hasSelected">
+			<button :class="['add-address', isManage && hasSelected ? 'delete-address' : '', isManage && !hasSelected ? 'disabled-btn' : '']" :disabled="isManage && !hasSelected">
 				{{ isManage ? '删除' : '添加收货地址' }}
 			</button>
 		</view>
@@ -84,6 +87,13 @@ export default {
 			});
 		},
 		toggleManage() {
+			if (!this.addresses.length) {
+				uni.showToast({
+					title: '暂无数据',
+					icon: 'none'
+				});
+				return;
+			}
 			this.isManage = !this.isManage;
 			if (!this.isManage) {
 				this.addresses.forEach((address) => (address.isSelected = false));
@@ -304,5 +314,12 @@ export default {
 button[disabled] {
 	background: #ccc;
 	color: #ffffff;
+}
+.center-empty {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: calc(100vh - 114rpx);
 }
 </style>

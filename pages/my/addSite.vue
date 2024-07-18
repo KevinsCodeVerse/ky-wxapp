@@ -41,6 +41,7 @@ export default {
 	data() {
 		return {
 			show: false,
+			type: null, //标记保存跳转
 			form: {
 				id: '',
 				name: '',
@@ -60,6 +61,9 @@ export default {
 	onLoad(options) {
 		if (options.query) {
 			this.getAddressDetail(JSON.parse(options.query));
+		}
+		if (options.type) {
+			this.type = options.type;
 		}
 	},
 	onReady() {
@@ -144,6 +148,11 @@ export default {
 							title: '新增成功',
 							icon: 'success'
 						});
+						if (this.type == 1) {
+							setTimeout(() => {
+								uni.navigateBack(1);
+							}, 1000);
+						}
 						uni.navigateBack();
 						this.restForm();
 					},

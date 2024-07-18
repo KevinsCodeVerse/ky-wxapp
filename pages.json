@@ -93,7 +93,15 @@
 			"style": {
 				"navigationBarTitleText": "添加收货地址"
 			}
-		}, {
+		},
+		{
+			"path": "pages/shop/selectAddress",
+			"style": {
+				"navigationBarTitleText": "选择收货地址"
+			}
+		},
+
+		{
 			"path": "pages/protocol/index",
 			"style": {
 				"navigationBarTitleText": "用户协议"

@@ -4,14 +4,14 @@
 			<swiper class="swiper-box" :current="swiperCurrent" @transition="transition" @animationfinish="animationfinish">
 				<swiper-item class="swiper-item">
 					<scroll-view class="scroll-view" scroll-y style="height: calc(100vh - 114rpx); width: 100%" @scrolltolower="reachBottom">
-						<view class="page-box">
+						<view class="page-box" v-if="goodsList.length">
 							<view class="order">
 								<u-checkbox-group @change="checkboxGroupChange">
 									<view v-for="(item, index) in goodsList" :key="index">
 										<u-checkbox
 											class="item-bgc"
 											shape="circle"
-											@change="checkboxChange"
+											@change="goodsList.length === 0 ? showNoDataToast : checkboxChange"
 											v-model="item.checked"
 											:name="item.proName"
 											style="background-color: #fff; border-radius: 20rpx"
@@ -38,12 +38,13 @@
 								</u-checkbox-group>
 							</view>
 						</view>
+						<u-empty v-else icon-size="550rpx" src="../../../static/index/noEmty.png" text=" " class="center-empty"></u-empty>
 					</scroll-view>
 				</swiper-item>
 			</swiper>
 			<view class="footer">
 				<view class="radio">
-					<u-checkbox shape="circle" v-model="isAllChecked" @change="toggleSelectAll">全选</u-checkbox>
+					<u-checkbox shape="circle" v-model="isAllChecked" @change="goodsList.length === 0 ? showNoDataToast : toggleSelectAll">全选</u-checkbox>
 				</view>
 				<view>
 					<span class="text">已选{{ totalNum }}件,</span>
@@ -52,7 +53,7 @@
 					<text class="decimal">{{ priceInt(totalPrice) }}.{{ priceDecimal(totalPrice) }}</text>
 				</view>
 				<view class="btn-box">
-					<button class="btn" @click="submitOrder">确定</button>
+					<button :disabled="goodsList.length == 0" :class="{ 'disabled-btn': goodsList.length == 0 }" class="btn" @click="submitOrder">确定</button>
 				</view>
 			</view>
 		</view>
@@ -83,13 +84,13 @@ export default {
 		},
 		priceDecimal() {
 			return (val) => {
-				val = val.toString(); // 确保 val 是字符串
+				val = val.toString();
 				return val.split('.')[1] || '00';
 			};
 		},
 		priceInt() {
 			return (val) => {
-				val = val.toString(); // 确保 val 是字符串
+				val = val.toString();
 				return val.split('.')[0];
 			};
 		}
@@ -140,6 +141,10 @@ export default {
 			});
 		},
 		submitOrder() {
+			if (this.goodsList.length === 0) {
+				this.showNoDataToast();
+				return;
+			}
 			let selectedItems = this.goodsList.filter((item) => item.checked);
 			let carIds = selectedItems.map((item) => item.id);
 			let products = selectedItems.map((item) => ({
@@ -159,6 +164,12 @@ export default {
 			uni.navigateTo({
 				url: `/pages/shop/order?products=${encodeURIComponent(JSON.stringify(products))}&carIds=${JSON.stringify(carIds)}`
 			});
+		},
+		showNoDataToast() {
+			uni.showToast({
+				title: '暂无数据',
+				icon: 'none'
+			});
 		}
 	},
 	onLoad() {
@@ -166,15 +177,6 @@ export default {
 	}
 };
 </script>
-
-<style>
-/* #ifndef H5 */
-page {
-	height: 100%;
-	background-color: #f2f2f2;
-}
-/* #endif */
-</style>
 
 <style lang="scss" scoped>
 .page-box {
@@ -360,6 +362,10 @@ page {
 				background: #002fa7;
 				text-align: center;
 				color: #fff;
+				&.disabled-btn {
+					background: #ccc;
+					color: #fff;
+				}
 			}
 		}
 	}
@@ -376,5 +382,13 @@ page {
 .swiper-item {
 	width: 100%;
 	height: 100%;
+}
+
+.center-empty {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	height: calc(100vh - 114rpx);
 }
 </style>

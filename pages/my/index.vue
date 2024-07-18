@@ -6,10 +6,9 @@
 					<u-avatar :src="avatar" width="96rpx" height="96rpx"></u-avatar>
 				</view>
 				<view class="">
-					<view class="name">{{name}}</view>
-					<view class="phone">{{phone}}</view>
+					<view class="name">{{ name }}</view>
+					<view class="phone">{{ phone }}</view>
 				</view>
-
 			</view>
 		</view>
 		<view class="vmb-my-nav">
@@ -45,20 +44,37 @@
 		</view>
 
 		<view class="main">
-					<view class="">
-			<u-cell-group>
-				<u-cell-item @tap="openPage('pages/my/address')" icon="map" title="地址管理"></u-cell-item>
-				</u-cell-group>
-				</view>
-			</u-cell-group>
 			<view class="">
 				<u-cell-group>
+					<u-cell-item @tap="openPage('pages/my/address')" title="地址管理">
+						<template #icon>
+							<image src="@/static/my/my-item1.png" class="custom-icon"></image>
+						</template>
+					</u-cell-item>
+				</u-cell-group>
+			</view>
+
+			<!-- 			<view class="">
+				<u-cell-group>
 					<u-cell-item icon="coupon" title="商品推广" @click="openPage('pages/my/goodsTgDt')"></u-cell-item>
+				</u-cell-group>
+			</view> -->
+			<view class="">
+				<u-cell-group>
+					<u-cell-item @click="openPage('pages/my/goodsTgDt')" title="商品推广">
+						<template #icon>
+							<image src="@/static/my/my-item2.png" class="custom-icon"></image>
+						</template>
+					</u-cell-item>
 				</u-cell-group>
 			</view>
 			<view class="">
 				<u-cell-group>
-					<u-cell-item icon="setting" title="平台推广" @click="openPage('pages/my/pt/goodsTgDt')"></u-cell-item>
+					<u-cell-item @click="openPage('pages/my/pt/goodsTgDt')" title="平台推广">
+						<template #icon>
+							<image src="@/static/my/my-item3.png" class="custom-icon"></image>
+						</template>
+					</u-cell-item>
 				</u-cell-group>
 			</view>
 		</view>
@@ -71,37 +87,40 @@ export default {
 		return {
 			pic: 'https://i.gtimg.cn/club/item/face/img/2/15922_100.gif',
 			show: true,
-			name:'',
-			phone:'',
-			avatar:''
+			name: '',
+			phone: '',
+			avatar: ''
 		};
 	},
 	onLoad() {
-		this.getInfo()
+		this.getInfo();
 	},
 	methods: {
-		getInfo(){
-			
-			this.name = uni.getStorageSync('name')
-			this.phone = uni.getStorageSync('phone')
-			this.avatar = uni.getStorageSync('avatar')
+		getInfo() {
+			this.name = uni.getStorageSync('name');
+			this.phone = uni.getStorageSync('phone');
+			this.avatar = uni.getStorageSync('avatar');
 		},
-		toOrder(status){
+		toOrder(status) {
 			uni.navigateTo({
-				url:`/pages/orderList/order?status=${status}`
-			})
+				url: `/pages/orderList/order?status=${status}`
+			});
 		},
 		openPage(path) {
 			this.$u.route({
 				url: path
 			});
-		},
-
+		}
 	}
 };
 </script>
 
 <style lang="scss" scoped>
+.custom-icon {
+	width: 36rpx;
+	height: 36rpx;
+	margin-right: 10rpx;
+}
 .name {
 	font-weight: 700;
 	font-size: 38rpx;
@@ -121,7 +140,7 @@ export default {
 	color: #333;
 }
 .main {
-	margin-top:40rpx;
+	margin-top: 40rpx;
 	padding: 0 35rpx;
 	border-radius: 20rpx;
 }
@@ -133,7 +152,7 @@ export default {
 		box-sizing: border-box;
 		width: 100%;
 		height: 230rpx;
-		background: radial-gradient(87.28% 89.35% at 19.20% 4.87%, #f5ebd7 0%, #f5ebd700 100%);
+		background: radial-gradient(87.28% 89.35% at 19.2% 4.87%, #f5ebd7 0%, #f5ebd700 100%);
 		background-size: 100% 100%;
 		padding: 20rpx 30rpx;
 		border-radius: 20rpx;

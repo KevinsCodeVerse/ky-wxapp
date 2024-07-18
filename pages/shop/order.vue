@@ -1,5 +1,5 @@
 <template>
-	<view class="page">
+	<view class="order-page">
 		<scroll-view class="content" scroll-y="true">
 			<!-- 收件人信息 -->
 			<view class="address-box">
@@ -7,13 +7,15 @@
 					<view v-if="address.name" class="address-item">
 						<u-icon size="40rpx" class="icon" name="map" color="#3c3c3c"></u-icon>
 						<view class="address-details">
-							<view class="name-phone">{{ address.name }} {{ address.phone }}</view>
+							<text class="name-phone">{{ address.name }}</text>
+							<text class="phone">{{ address.phone }}</text>
 							<view class="address">{{ address.address }}</view>
 						</view>
+						<u-icon @click="toSelectAddress" size="24rpx" style="margin-right: 20rpx" name="arrow-right" color="#3c3c3c"></u-icon>
 					</view>
 					<view v-else class="address-item">
 						<u-icon color="#3c3c3c" size="40rpx" class="icon" name="map"></u-icon>
-						<view class="add-address">+添加收货地址</view>
+						<view @click="toAddress" class="add-address">+添加收货地址</view>
 					</view>
 				</view>
 				<image class="address-line" src="@/static/index/address-line.png" mode="widthFix"></image>
@@ -166,6 +168,10 @@ export default {
 					success: (res) => {
 						if (this.selectedPaymentMethod == 'member' && res) {
 							this.payOrder(res);
+						} else {
+							setTimeout(() => {
+								uni.navigateBack(1);
+							}, 1000);
 						}
 
 						// 在此处添加提交订单成功后的逻辑
@@ -190,6 +196,9 @@ export default {
 						title: '订单提交成功',
 						icon: 'success'
 					});
+					setTimeout(() => {
+						uni.navigateBack(1);
+					}, 1000); // 显示提示信息2秒后再后退
 				},
 				fail: (err) => {
 					uni.showToast({
@@ -198,19 +207,27 @@ export default {
 					});
 				}
 			});
+		},
+		toAddress() {
+			uni.navigateTo({
+				url: '/pages/my/addSite?type=1'
+			});
+		},
+		toSelectAddress() {
+			uni.navigateTo({
+				url: '/pages/shop/selectAddress'
+			});
 		}
 	}
 };
 </script>
 
 <style lang="scss" scoped>
-.page {
+.order-page {
 	background-color: #f5f5f5;
 	padding: 20rpx;
 }
 
-.content {
-}
 .address-box {
 	background-color: #fff;
 	border-radius: 10rpx;
@@ -218,7 +235,8 @@ export default {
 }
 .address-info {
 	background-color: #fff;
-	padding: 20rpx 0;
+	padding-top: 20rpx;
+	padding-bottom: 10rpx;
 	display: flex;
 	align-items: center;
 }
@@ -231,13 +249,22 @@ export default {
 	flex: 1;
 	margin-left: 10rpx;
 }
-.name-phone {
-	font-weight: bold;
+.name {
+	font-weight: 900;
 	font-size: 30rpx;
-	margin-bottom: 10rpx;
+	text-align: left;
+	color: #222;
+}
+.phone {
+	font-weight: 400;
+	font-size: 24rpx;
+	margin: 0 10rpx;
+	color: #999;
 }
 .address {
-	color: #666;
+	font-weight: 400;
+	font-size: 24rpx;
+	color: #999;
 }
 .add-address {
 	color: #002fa7;
@@ -300,9 +327,11 @@ export default {
 }
 .fee-label {
 	font-size: 28rpx;
-	color: #666;
+	font-weight: 900;
+	color: #222;
 }
 .fee-value {
+	font-weight: 900;
 	font-size: 28rpx;
 	color: #222;
 }
@@ -346,23 +375,26 @@ export default {
 	}
 }
 .total-price-label {
-	font-size: 30rpx;
-	color: #666;
+	font-weight: 700;
+	font-size: 32rpx;
+	text-align: left;
+	color: #333;
 }
 .total-price-value {
-	font-size: 36rpx;
-	font-weight: bold;
-	color: #222;
+	font-weight: 700;
+	font-size: 32rpx;
+	text-align: left;
+	color: #bf8739;
 }
 .submit-order {
-	width: 200rpx;
-	height: 60rpx;
+	width: 384rpx;
+	height: 80rpx;
+	line-height: 80rpx;
+	border-radius: 40rpx;
 	background-color: #002fa7;
 	color: #fff;
 	font-size: 28rpx;
 	text-align: center;
-	line-height: 60rpx;
-	border-radius: 30rpx;
 }
 .submit-order-disabled {
 	background-color: #ccc;
