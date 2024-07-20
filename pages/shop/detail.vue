@@ -230,8 +230,6 @@ export default {
 			this.buyNow();
 		},
 		addCart() {
-			console.log('pro', this.pro);
-			console.log('this.popupData.currentSku.id', this.popupData.currentSku.id);
 			this.$request.post({
 				url: 'user/userShopCar/addShopCar',
 				params: {
@@ -250,6 +248,7 @@ export default {
 						title: '加入购物车成功',
 						icon: 'none'
 					});
+					this.show = false;
 					this.addedCartId = res; // 保存加入购物车后的id
 					if (this.popupData.quantity > 1) {
 						this.editCart();

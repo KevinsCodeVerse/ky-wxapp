@@ -32,6 +32,7 @@
 				</view>
 			</view>
 			<view class="order-summary">
+				<text class="title">订单信息</text>
 				<view class="summary-item">
 					<text>订单号</text>
 					<view>
@@ -43,6 +44,25 @@
 				<view class="summary-item" v-for="(field, index) in summaryFields" :key="index">
 					<text>{{ field.label }}</text>
 					<text class="field-value">{{ field.value }}</text>
+				</view>
+				<text class="title">快递信息</text>
+				<view v-for="item in devList" :key="item.id" class="">
+					<view class="summary-item">
+						<text>发货时间</text>
+						<text class="field-value">{{ item.createTime }}</text>
+					</view>
+					<view class="summary-item">
+						<text>{{ item.logisticsCompany }}</text>
+						<text class="field-value">
+							{{ item.logisticsNumber }}
+							<text style="margin: 0 10rpx">|</text>
+							<text class="copy-icon" @click="copylogisticsNumber(item.logisticsNumber)">复制</text>
+						</text>
+					</view>
+					<scroll-view class="order-item-imgbox" scroll-x>
+						<image v-for="(img, index) in orderPays" :key="index" class="order-item-image" :src="$comm.fullPath(img.proInfo.avatar)"></image>
+					</scroll-view>
+					<view class="count">共{{ item.count }}件商品</view>
 				</view>
 			</view>
 		</scroll-view>
@@ -63,6 +83,7 @@ export default {
 		return {
 			orderDetail: {},
 			orderPays: [],
+			devList: [],
 			summaryFields: []
 		};
 	},
@@ -80,6 +101,7 @@ export default {
 				params: { orderId },
 				success: (res) => {
 					this.orderDetail = res.orderDetail;
+					this.devList = res.devList;
 					this.orderPays = res.orderPays.map((pay) => ({
 						...pay,
 						proInfo: JSON.parse(pay.proInfo)
@@ -92,10 +114,6 @@ export default {
 			this.summaryFields = [
 				{ label: '订单生成时间', value: this.orderDetail.createTime },
 				{ label: '支付时间', value: this.orderDetail.payTime || '-' },
-				{ label: '发货时间', value: this.orderDetail.deliveryTime || '-' },
-				{ label: '快递公司', value: this.orderDetail.expressCompany || '-' },
-				{ label: '物流单号', value: this.orderDetail.expressNumber || '-' },
-				{ label: '收货时间', value: this.orderDetail.receiptTime || '-' },
 				{ label: '交易完成时间', value: this.orderDetail.completeTime || '-' }
 			];
 		},
@@ -163,10 +181,7 @@ export default {
 				case 1:
 					return [{ text: '取消订单', action: 'cancel', class: 'default-button' }];
 				case 2:
-					return [
-						{ text: '查看物流', action: 'viewLogistics', class: 'default-button' },
-						{ text: '确认收货', action: 'confirmReceipt', class: 'primary-button' }
-					];
+					return [{ text: '确认收货', action: 'confirmReceipt', class: 'primary-button' }];
 				case 3:
 					return [{ text: '申请售后', action: 'applyAfterSale', class: 'default-button' }];
 				case 4:
@@ -198,43 +213,48 @@ export default {
 					this.applyReturn(item);
 					break;
 				case 'reorder':
-					this.reorder(item);
+					uni.navigateTo({
+						url: `/pages/shop/detail?id=${this.orderPays[0].proId}`
+					});
 					break;
 			}
 		},
 		cancelOrder(item) {
-			// Cancel order logic with item parameter
 			console.log('Cancel order', item);
 		},
 		payOrder(item) {
-			// Pay order logic with item parameter
 			console.log('Pay order', item);
 		},
 		viewLogistics(item) {
-			// View logistics logic with item parameter
 			console.log('View logistics', item);
 		},
 		confirmReceipt(item) {
-			// Confirm receipt logic with item parameter
 			console.log('Confirm receipt', item);
 		},
 		applyAfterSale(item) {
-			// Apply after sale logic with item parameter
 			console.log('Apply after sale', item);
 		},
 		applyReturn(item) {
-			// Apply return logic with item parameter
 			console.log('Apply return', item);
 		},
 		reorder(item) {
-			// Reorder logic with item parameter
-			console.log('Reorder', item);
+			uni.navigateTo({
+				url: `/pages/shop/detail?id=${this.orderPays[0].proId}`
+			});
 		},
 		copyOrderId() {
 			uni.setClipboardData({
 				data: this.orderDetail.orderId.toString(),
 				success() {
 					uni.showToast({ title: '订单号已复制', icon: 'none' });
+				}
+			});
+		},
+		copylogisticsNumber(item) {
+			uni.setClipboardData({
+				data: item.toString(),
+				success() {
+					uni.showToast({ title: '物流单号已复制', icon: 'none' });
 				}
 			});
 		},
@@ -255,13 +275,14 @@ export default {
 <style lang="scss" scoped>
 .container {
 	height: 100vh;
-	padding: 0 20rpx;
 	display: flex;
 	flex-direction: column;
 	background: #f5f5f5;
 }
 .order-detail-scroll {
 	flex: 1;
+	overflow: auto;
+	padding-bottom: 100rpx; // 留出底部按钮的空间
 }
 .order-status-header {
 	padding: 20rpx;
@@ -320,6 +341,7 @@ export default {
 }
 .order-item {
 	display: flex;
+	margin: 10px 0;
 }
 .pay-item {
 	display: flex;
@@ -343,6 +365,16 @@ export default {
 	width: 100%;
 	height: 2rpx;
 	background: #eee;
+}
+.order-item-imgbox {
+	display: flex;
+	overflow-x: auto;
+	image {
+		width: 100rpx;
+		height: 100rpx;
+		margin-right: 25rpx;
+		border-radius: 12rpx;
+	}
 }
 .order-item-image {
 	width: 150rpx;
@@ -382,6 +414,12 @@ export default {
 }
 
 .order-summary {
+	.title {
+		font-size: 30rpx;
+		text-align: left;
+		color: #222;
+		font-weight: 900;
+	}
 	padding: 20rpx;
 	background-color: #fff;
 	margin-top: 20rpx;
@@ -389,6 +427,10 @@ export default {
 	font-size: 28rpx;
 	text-align: left;
 	color: #999;
+	.count {
+		text-align: center;
+		margin: 10px 0;
+	}
 }
 .summary-item {
 	display: flex;

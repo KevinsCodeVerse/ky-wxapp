@@ -2,10 +2,6 @@
 	<view class="page">
 		<view class="header">
 			<view class="title">地址列表</view>
-			<view class="right">
-				<u-icon :name="isManage ? 'checkmark' : 'setting'" size="32rpx"></u-icon>
-				<view class="manage" @click="toggleManage">{{ isManage ? '完成' : '管理' }}</view>
-			</view>
 		</view>
 		<scroll-view class="address-list" scroll-y="true">
 			<block v-if="addresses.length">
@@ -24,16 +20,9 @@
 							<view class="address-bottom">
 								<view class="address-box">
 									<view class="address">{{ address.address }}</view>
-									<u-icon @click="editAddress(address)" v-if="!isManage" name="arrow-right" size="32rpx"></u-icon>
+									<u-button type="success" size="mini" @click="okAddress(address)">确定</u-button>
 								</view>
-								<view v-if="!isManage" class="line"></view>
-								<view v-if="!isManage" class="set-default">
-									<view class="left" @click.stop="selectDefaultAddress(index)">
-										<radio color="#002FA7" :checked="address.isDefault" />
-										<text class="default">设为默认地址</text>
-									</view>
-									<view class="delete" @click.stop="deleteAddress(address)">删除</view>
-								</view>
+								<view class="line"></view>
 							</view>
 						</view>
 					</view>
@@ -41,11 +30,6 @@
 			</block>
 			<u-empty v-else icon-size="550rpx" src="../../../static/index/noEmty.png" text=" " class="center-empty"></u-empty>
 		</scroll-view>
-		<view @click="isManage ? deleteSelectedAddresses() : addAddress()">
-			<button :class="['add-address', isManage && hasSelected ? 'delete-address' : '', isManage && !hasSelected ? 'disabled-btn' : '']" :disabled="isManage && !hasSelected">
-				{{ isManage ? '删除' : '添加收货地址' }}
-			</button>
-		</view>
 	</view>
 </template>
 
@@ -58,7 +42,8 @@ export default {
 				pageNo: 1,
 				pageSize: 200
 			},
-			addresses: []
+			addresses: [],
+			selectAddressData: null
 		};
 	},
 	computed: {
@@ -99,11 +84,16 @@ export default {
 				this.addresses.forEach((address) => (address.isSelected = false));
 			}
 		},
-		editAddress(row) {
+		okAddress(row) {
 			const query = JSON.stringify(row);
-			uni.navigateTo({
-				url: `/pages/my/addSite?query=${query}`
+			this.selectAddressData = query;
+			const pages = getCurrentPages();
+			const previousPage = pages[pages.length - 2]; // 获取上一页实例
+			// 传递数据到上一页
+			previousPage.setData({
+				selectedAddress: row
 			});
+			uni.navigateBack(1);
 		},
 		addAddress() {
 			uni.navigateTo({
