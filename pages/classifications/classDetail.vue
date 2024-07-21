@@ -15,7 +15,7 @@
 				</view>
 				<!-- 商品列表 -->
 				<view class="product-list" v-if="products.length > 0">
-					<view class="product-item" v-for="(product, index) in products" :key="index">
+					<view class="product-item" v-for="(product, index) in products" :key="index" @click="toShopDetail(product)">
 						<image class="product-image" :src="$comm.fullPath(product.cover)" mode="aspectFit"></image>
 						<view class="product-info">
 							<text class="product-name">{{ product.name }}</text>
@@ -89,6 +89,11 @@ export default {
 						});
 					}
 				}
+			});
+		},
+		toShopDetail(product) {
+			uni.navigateTo({
+				url: `/pages/shop/detail?id=${product.id}`
 			});
 		},
 		loadSubCategoryOrProducts(item) {

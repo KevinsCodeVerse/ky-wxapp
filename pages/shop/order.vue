@@ -4,18 +4,18 @@
 			<!-- 收件人信息 -->
 			<view class="address-box">
 				<view class="address-info">
-					<view v-if="address.name" class="address-item">
+					<view v-if="address.name" class="address-item" @click="toSelectAddress">
 						<u-icon size="40rpx" class="icon" name="map" color="#3c3c3c"></u-icon>
 						<view class="address-details">
 							<text class="name-phone">{{ address.name }}</text>
 							<text class="phone">{{ address.phone }}</text>
 							<view class="address">{{ address.address }}</view>
 						</view>
-						<u-icon @click="toSelectAddress" size="24rpx" style="margin-right: 20rpx" name="arrow-right" color="#3c3c3c"></u-icon>
+						<u-icon size="24rpx" style="margin-right: 20rpx" name="arrow-right" color="#3c3c3c"></u-icon>
 					</view>
 					<view v-else class="address-item">
 						<u-icon color="#3c3c3c" size="40rpx" class="icon" name="map"></u-icon>
-						<view @click="toAddress" class="add-address">+添加收货地址</view>
+						<view @click="toAddress" class="add-address">+ 添加收货地址</view>
 					</view>
 				</view>
 				<image class="address-line" src="@/static/index/address-line.png" mode="widthFix"></image>
@@ -77,11 +77,11 @@ export default {
 				{ label: '会员账户', value: 'member', icon: require('@/static/index/vip-icon.png') },
 				{ label: '线下购买', value: 'offline', icon: require('@/static/index/shop-icon.png') }
 			],
+			selectedAddress: null,
 			selectedPaymentMethod: 'member'
 		};
 	},
 	onLoad(options) {
-		// 获取上一页传递的参数
 		if (options.products) {
 			this.products = JSON.parse(decodeURIComponent(options.products));
 			this.carIds = JSON.parse(options.carIds);
@@ -97,7 +97,20 @@ export default {
 		}
 	},
 	onShow() {
-		this.getDefaultAddress();
+		const pages = getCurrentPages();
+		const currentPage = pages[pages.length - 1]; // 获取当前页面实例
+		if (currentPage.data.selectedAddress) {
+			const res = currentPage.data.selectedAddress;
+			this.address = {
+				id: res.id,
+				address: res.address,
+				name: res.name,
+				phone: res.phone
+			};
+			console.log('address', this.address);
+		} else {
+			this.getDefaultAddress();
+		}
 	},
 	computed: {
 		totalPrice() {
@@ -169,6 +182,10 @@ export default {
 						if (this.selectedPaymentMethod == 'member' && res) {
 							this.payOrder(res);
 						} else {
+							uni.showToast({
+								title: '订单提交成功',
+								icon: 'success'
+							});
 							setTimeout(() => {
 								uni.navigateBack(1);
 							}, 1000);

@@ -2,11 +2,12 @@
 	<view class="vmb-container">
 		<view class="vmb-my-header">
 			<view class="u-flex user-box u-p-r-20 u-p-b-30">
-				<view class="u-m-r-10">
+				<view class="u-m-r-10" @click="chooseAvatar">
 					<u-avatar :src="avatar" width="96rpx" height="96rpx"></u-avatar>
 				</view>
 				<view class="">
-					<view class="name">{{ name }}</view>
+					<input class="name-input" v-if="editingName" v-model="name" @blur="saveName" @keyup.enter="saveName" />
+					<view v-else class="name" @click="editName">{{ name }}</view>
 					<view class="phone">{{ phone }}</view>
 				</view>
 			</view>
@@ -53,12 +54,6 @@
 					</u-cell-item>
 				</u-cell-group>
 			</view>
-
-			<!-- 			<view class="">
-				<u-cell-group>
-					<u-cell-item icon="coupon" title="商品推广" @click="openPage('pages/my/goodsTgDt')"></u-cell-item>
-				</u-cell-group>
-			</view> -->
 			<view class="">
 				<u-cell-group>
 					<u-cell-item @click="openPage('pages/my/goodsTgDt')" title="商品推广">
@@ -89,7 +84,8 @@ export default {
 			show: true,
 			name: '',
 			phone: '',
-			avatar: ''
+			avatar: '',
+			editingName: false
 		};
 	},
 	onLoad() {
@@ -110,6 +106,50 @@ export default {
 			this.$u.route({
 				url: path
 			});
+		},
+		chooseAvatar() {
+			uni.chooseImage({
+				count: 1,
+				sizeType: ['compressed'],
+				sourceType: ['album', 'camera'],
+				success: (res) => {
+					const filePath = res.tempFilePaths[0];
+					uni.uploadFile({
+						url: '/user/userInfo/uploadAvatar',
+						filePath: filePath,
+						name: 'file',
+						success: (uploadRes) => {
+							const data = JSON.parse(uploadRes.data);
+							if (data.success) {
+								this.avatar = data.url;
+								uni.setStorageSync('avatar', data.url);
+							} else {
+								uni.showToast({
+									title: '上传失败',
+									icon: 'none'
+								});
+							}
+						},
+						fail: (err) => {
+							console.log('err', err);
+							uni.showToast({
+								title: '上传失败',
+								icon: 'none'
+							});
+						}
+					});
+				}
+			});
+		},
+		editName() {
+			this.editingName = true;
+			this.$nextTick(() => {
+				this.$refs.nameInput.focus();
+			});
+		},
+		saveName() {
+			this.editingName = false;
+			uni.setStorageSync('name', this.name);
 		}
 	}
 };
@@ -126,6 +166,14 @@ export default {
 	font-size: 38rpx;
 	text-align: left;
 	color: #000;
+}
+.name-input {
+	font-weight: 700;
+	font-size: 38rpx;
+	text-align: left;
+	color: #000;
+	border: none;
+	border-bottom: 1px solid #ccc;
 }
 .phone {
 	font-weight: 400;
@@ -162,21 +210,17 @@ export default {
 				width: 96rpx;
 				height: 96rpx;
 			}
-
 			.u-p-b-20 {
 				color: #ffffff;
 			}
-
 			.u-tips-color {
 				color: #ffffff;
 			}
-
 			.u-icon__icon {
 				color: #ffffff !important;
 			}
 		}
 	}
-
 	&-my-nav {
 		width: calc(100% - 60rpx);
 		margin-left: auto;
@@ -210,7 +254,6 @@ export default {
 				}
 			}
 		}
-
 		::v-deep {
 			.u-grid {
 				.u-grid-item {
