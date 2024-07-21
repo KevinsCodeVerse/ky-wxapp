@@ -182,8 +182,8 @@
 	  <!--分享海报弹框-->
 	  <u-popup v-model="shareShow" mode="bottom" :closeable="true" close-icon="close-circle" custom-style="height: 660rpx;padding:15">
 	      <view class="select_box">
-	          <view class="title">选择分享海报</view>
-	          <view style="display: flex; margin-bottom: 15rpx">
+	          <view class="title" v-if="shareImgList.length > 0">选择分享海报</view>
+	          <view style="display: flex; margin-bottom: 15rpx" v-if="shareImgList.length > 0">
 	              <u-icon class="right_j" name="arrow-left" />
 	              <scroll-view class="select_img_box" :scroll-x="true">
 	                  <view class="bxx">
@@ -247,18 +247,12 @@ export default {
 	  shareShow: false,
 	  message:'',
 	  indexs: 0,
-	  shareImgList:[
-		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
-		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
-		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
-		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
-		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
-		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
-	  ]
+	  shareImgList:[]
     };
   },
   onLoad() {
-    this.tgInfo()
+    this.tgInfo();
+	this.getShareImgList();
   },
   onShareAppMessage(res) {
       let id = uni.getStorageSync('usId'); // 分享产品的Id
@@ -276,6 +270,18 @@ export default {
       };
   },
   methods: {
+	  getShareImgList(){
+	  	this.$request.post({
+	  		url: 'user/sysShareImg/all',
+	  		params: {
+	  			type: 2,
+				infoId: uni.getStorageSync("infoId"),
+	  		},
+	  		success: (res) => {
+	  			this.shareImgList = res;
+	  		}
+	  	});
+	  },
     tgInfo() {
       this.$request.post({
         url: 'user/userRoyalFlowPro/tgInfo',
