@@ -18,38 +18,38 @@
 		<view>
 			<scroll-view scroll-y="true" class="scroll-Y content" @scrolltolower="getList">
 				<view style="background-color: #fff;margin: 24rpx 32rpx;border-radius: 24rpx;padding: 16rpx 24rpx;"
-					v-for="(item,index) in 10">
+					v-for="(item,index) in list">
 					<view style="display: flex;flex-direction: column;justify-content: space-between;gap: 35rpx;">
 						<view style="display: flex;justify-content: space-between;">
 							<view style="display: flex;gap: 12rpx;align-items: center;">
-								<u-image width="44rpx" height="44rpx" src="https://cdn.uviewui.com/uview/album/1.jpg"
+								<u-image width="44rpx" height="44rpx" :src="$comm.fullPath(item.avatar)"
 									shape="circle"></u-image>
 								<view style="font-size: 26rpx;color: #333;">
-									陈逸诗
+									{{item.nick}}
 								</view>
 							</view>
 							<view>
-								<view v-html="getStatus(index)"></view>
+								<view v-html="getStatus(item.status)"></view>
 							</view>
 						</view>
 
 						<view style="display: flex;gap: 20rpx;">
 							<view>
-								<u-image width="112rpx" height="112rpx" src="https://cdn.uviewui.com/uview/album/1.jpg"
+								<u-image width="112rpx" height="112rpx" :src="$comm.fullPath(item.goodsAvatar)"
 									border-radius="20rpx"></u-image>
 							</view>
 							<view
 								style="display: flex;flex-direction: column;justify-content: space-between;width: -webkit-fill-available;">
 								<view style="display: flex;justify-content: space-between;">
 									<view style="font-weight: 700;font-size: 28rpx;color: #000;">
-										商家名称
+										{{item.tenantName}}
 									</view>
 									<view style="font-size: 28rpx;color: #aaa;">
-										直推
+										{{item.type == 1?'直推':'间推'}}
 									</view>
 								</view>
 								<view style="font-size: 24rpx;color: #aaa;">
-									这里是商品名字这里是商品名字这里是商品名字这里是商品名字这里是商品名字
+									{{item.goodsName}}
 								</view>
 							</view>
 
@@ -59,36 +59,38 @@
 								<view style="font-size: 24rpx;text-align: left;color: #aaa;">
 									付款金额
 								</view>
-								<view style="font-size: 24rpx;text-align: left;color: #f2a600;font-weight: 700;">￥178
+								<view style="font-size: 24rpx;text-align: left;color: #f2a600;font-weight: 700;">￥{{item.orderAmount}}
 								</view>
 							</view>
 							<view>
 								<view style="font-size: 24rpx;text-align: left;color: #aaa;">
 									提成比
 								</view>
-								<view style="font-size: 24rpx;text-align: left;color: #f2a600;font-weight: 700;">0.29%
+								<view style="font-size: 24rpx;text-align: left;color: #f2a600;font-weight: 700;">{{item.secRatio}}%
 								</view>
 							</view>
 							<view>
 								<view style="font-size: 24rpx;text-align: left;color: #aaa;">
 									预估提成
 								</view>
-								<view style="font-size: 24rpx;text-align: left;color: #f2a600;font-weight: 700;">￥11.06
+								<view style="font-size: 24rpx;text-align: left;color: #f2a600;font-weight: 700;">￥{{item.secAmount}}
 								</view>
 							</view>
 						</view>
 						<view style="font-size: 26rpx;text-align: left;color: #aaa;">
-							创建时间：2023-10-09 10:10:10
+							创建时间：{{item.createTime}}
 						</view>
 					</view>
 
 
 				</view>
 			</scroll-view>
+			<u-loadmore :status="loadStatus" @loadmore="getList"></u-loadmore>
 		</view>
 
 		<!-- 底部bar -->
 		<view
+			v-if="!params.id"
 			style="position: absolute;padding: 30rpx 40rpx 50rpx 40rpx;border-radius: 20rpx 20rpx 0 0;background-color: #fff;bottom: 0;width: 100vw;">
 			<view style="display: flex;justify-content: space-between;">
 				<view @click="openPage('/pages/my/goodsTgDt',1)"
@@ -127,14 +129,17 @@
 		data() {
 			return {
 				params: {
-					tg: "",
-					zt: "",
-					sort: ""
+					id:'',
+					type: "",
+					status: "",
+					sort: 2,
+					pageNo: 0,
+					pageSize: 10,
 				},
 				sxDialog: false,
 				sxList: [],
 				tgList: [{
-					value: "1-0",
+					value: "1-",
 					label: '直推/间推'
 				}, {
 					value: "1-1",
@@ -144,17 +149,22 @@
 					label: '间推'
 				}],
 				ztList: [{
-					value: "2-0",
+					value: "2-",
 					label: '全部状态'
-				}, {
+				},
+				{
+					value: "2-0",
+					label: '待付款'
+				},
+				{
 					value: "2-1",
 					label: '冻结中'
 				}, {
 					value: "2-2",
-					label: '可用'
+					label: '已发放'
 				}, {
 					value: "2-3",
-					label: '用户退款'
+					label: '已退款'
 				}],
 				sortList: [{
 					value: "3-1",
@@ -166,20 +176,60 @@
 				zt: "全部状态",
 				tg: "直推/间推",
 				sort: "排序",
+				list:[],
+				loadStatus: 'loadmore',
 			}
+		},
+		onLoad(e){
+			if(e.usId) {
+				this.params.id = e.usId;
+			}
+			if(e.usNick) {
+				uni.setNavigationBarTitle({
+					title: e.usNick+"的分佣记录"
+				});
+			}
+			this.search();
 		},
 		methods: {
 			getStatus(e) {
-				console.log("e1:", e);
-				if (e % 2 == 0) {
-					console.log("123123");
-					return "<div style='color: #F2A600'>审核中</div>"
-				} else {
-					return "<div style='color: #aaa'>已通过</div>"
+				if(e === 0) {
+					return '待付款';
+				}else if( e === 1) {
+					return '冻结中';
+				}else if(e === 2) {
+					return '已发放';
+				}else if(e === 3) {
+					return '已退款';
 				}
 			},
+			search(){
+				this.list = [];
+				this.params.pageNo = 0;
+				this.loadStatus = 'loadmore';
+				this.getList();
+			},
 			getList() {
-				console.log("触底");
+				console.log('触底');
+				if(this.loadStatus != 'loadmore') return;
+				this.loadStatus = 'loading';
+				this.params.pageNo += 1;
+				this.$request.post({
+				  url: 'user/userRoyalFlowPro/royalList',
+				  params: this.params,
+				  success: (result) => {
+					  if(result.length < this.params.pageSize) {
+						  this.loadStatus = 'nomore';
+					  }else {
+						  this.loadStatus = 'loadmore';
+					  }
+					  this.list = [...this.list, ...result];
+				  },
+				  catch: (e) => {
+				  },
+				  finally: (e) => {
+				  }
+				});
 			},
 			openPage(path, type) {
 				if (!path) {
@@ -218,17 +268,18 @@
 				console.log("e:", e);
 				var value = e[0].value.split("-")
 				if (value[0] === "1") {
-					this.params.tg = value[1]
+					this.params.type = value[1]
 					this.tg = e[0].label
 				}
 				if (value[0] === "2") {
-					this.params.zt = value[1]
+					this.params.status = value[1]
 					this.zt = e[0].label
 				}
 				if (value[0] === "3") {
 					this.params.sort = value[1]
 					this.sort = e[0].label
 				}
+				this.search();
 				console.log("this.params:", this.params);
 			}
 		}

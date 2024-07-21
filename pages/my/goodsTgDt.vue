@@ -27,10 +27,10 @@
             </view>
             <view style="display: flex;" @click="ywDialog=true">
               <view>
-                <!-- <u-image width="128rpx" height="40rpx" src="/static/my/vip1.png"></u-image> -->
-                <!-- <u-image width="128rpx" height="40rpx" src="/static/my/vip2.png"></u-image> -->
-                <u-image width="108rpx" height="40rpx" src="/static/my/vip3.png"></u-image>
-                <!-- <u-image width="148rpx" height="40rpx" src="/static/my/vip4.png"></u-image> -->
+                <u-image width="128rpx" height="40rpx" src="/static/my/vip1.png" v-if="from.level===0"></u-image>
+                <u-image width="128rpx" height="40rpx" src="/static/my/vip2.png" v-if="from.level===1"></u-image>
+                <u-image width="108rpx" height="40rpx" src="/static/my/vip3.png" v-if="from.level===2"></u-image>
+                <u-image width="148rpx" height="40rpx" src="/static/my/vip4.png" v-if="from.level===3"></u-image>
               </view>
               <view>
                 <u-image width="32rpx" height="32rpx" src="/static/my/bangzhu.png"></u-image>
@@ -107,19 +107,20 @@
         </view>
         <view style="display: flex;justify-content: space-between;">
           <view
-              style="width: 280rpx;height: 80rpx;border-radius: 40rpx;background: linear-gradient(90.00deg, #ffc200 0%, #ffac00 100%);">
+              style="margin: auto;width: 280rpx;height: 80rpx;border-radius: 40rpx;background: linear-gradient(90.00deg, #ffc200 0%, #ffac00 100%);"
+			  @click="shareShow = true">
             <view
                 style="text-align: center;line-height: 80rpx;font-weight: 700;font-size: 28rpx;color: #fff;">
               分享链接
             </view>
           </view>
-          <view
+          <!-- <view
               style="width: 280rpx;height: 80rpx;border-radius: 40rpx;background: linear-gradient(90.00deg, #ffc200 0%, #ffac00 100%);">
             <view
                 style="text-align: center;line-height: 80rpx;font-weight: 700;font-size: 28rpx;color: #fff;">
               生成海报
             </view>
-          </view>
+          </view> -->
         </view>
       </view>
       <!-- 单元格 -->
@@ -177,6 +178,31 @@
           </view>
         </view>
       </u-popup>
+	  
+	  <!--分享海报弹框-->
+	  <u-popup v-model="shareShow" mode="bottom" :closeable="true" close-icon="close-circle" custom-style="height: 660rpx;padding:15">
+	      <view class="select_box">
+	          <view class="title">选择分享海报</view>
+	          <view style="display: flex; margin-bottom: 15rpx">
+	              <u-icon class="right_j" name="arrow-left" />
+	              <scroll-view class="select_img_box" :scroll-x="true">
+	                  <view class="bxx">
+	                      <view :class="indexs == index ? 'imgs hoverimgs' : 'imgs'" @click="indexs = index" v-for="(item, index) in shareImgList" :key="index">
+	                          <image class="acImg" :src="$comm.fullPath(item)"></image>
+	                      </view>
+	                  </view>
+	              </scroll-view>
+	              <u-icon class="left_j" name="arrow-right" />
+	          </view>
+	          <u-cell-group>
+	              <u-field v-model="message" label="分享文案" type="textarea" placeholder="请输入分享文案" autosize :border="false" />
+	          </u-cell-group>
+	          <view style="margin: 40rpx 30rpx">
+	              <u-button round type="primary" open-type="share" block>分享</u-button>
+	          </view>
+	      </view>
+	  </u-popup>
+	  
     </view>
     <!-- <view style="height: 130rpx;width: 100vw;">
 
@@ -217,12 +243,37 @@ export default {
       nextZt: -1,
       nextTeamTj: -1,
       ywDialog: false,
-      from: {}
-
+      from: {},
+	  shareShow: false,
+	  message:'',
+	  indexs: 0,
+	  shareImgList:[
+		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
+		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
+		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
+		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
+		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
+		  '/files/tenant/pro/52d5830a1c35ae02ea79c4a3ae80e3a2.png',
+	  ]
     };
   },
   onLoad() {
     this.tgInfo()
+  },
+  onShareAppMessage(res) {
+      let id = uni.getStorageSync('usId'); // 分享产品的Id
+      if (res.from === 'button') {
+          // 来自页面内转发按钮
+          console.log(res.target);
+      }
+	  console.log('id', id);
+	  console.log('this.indexs', this.indexs);
+      return {
+          title: this.message,
+          path: `pages/login/index?parentId=${id}`,
+          // 分享后打开的页面
+          imageUrl: this.$comm.fullPath(this.shareImgList[this.indexs])
+      };
   },
   methods: {
     tgInfo() {
@@ -271,5 +322,55 @@ page {
   width: 100%;
   height: 100vh;
   overflow: hidden;
+}
+
+.select_box {
+    margin: 30rpx;
+}
+.select_box .title {
+    font-size: 32rpx;
+    font-weight: 600;
+}
+.select_box .select_img_box {
+    width: calc(100vw - 120rpx);
+    padding: 0 !important;
+}
+.select_box .select_img_box .bxx {
+    display: flex;
+}
+.select_box .select_img_box .bxx::-webkit-scrollbar {
+    display: none !important;
+    color: transparent !important;
+}
+.select_box .select_img_box .imgs {
+    padding: 20rpx 10rpx;
+    display: flex;
+    justify-content: space-around;
+}
+.select_box .select_img_box .imgs button {
+    padding: 0 !important;
+    line-height: 0;
+    background-color: rgba(0, 0, 0, 0);
+}
+.select_box .select_img_box .imgs .acImg {
+    margin: 45rpx 15rpx 15rpx 5rpx;
+    width: 200rpx;
+    height: 140rpx;
+    border-radius: 10rpx;
+}
+.select_box .select_img_box .hoverimgs .acImg {
+    box-shadow: 0 0 12rpx 8rpx #f5d161;
+}
+.select_box .select_img_box::-webkit-scrollbar {
+    display: none !important;
+    color: transparent !important;
+}
+.select_box > view::-webkit-scrollbar {
+    display: none !important;
+    color: transparent !important;
+}
+.u-btn--primary {
+    border-color: #ffc200 !important;
+    background-color: #ffc200 !important;
 }
 </style>

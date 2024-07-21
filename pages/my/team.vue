@@ -24,7 +24,7 @@
               v-for="(item,index) in teamList">
           <view style="display: flex;align-items: center;">
             <view>
-              <u-image width="108rpx" height="108rpx" src="https://cdn.uviewui.com/uview/album/1.jpg"
+              <u-image width="108rpx" height="108rpx" :src="$comm.fullPath(item.avatar)"
                        shape="circle"></u-image>
             </view>
             <!-- 中间部分 -->
@@ -43,7 +43,7 @@
                 </view>
               </view>
               <view style="font-size: 22rpx;text-align: left;color: #999;">
-                注册时间:2024.06.29
+                注册时间:{{item.createTime}}
               </view>
               <view style="width: max-content;height: 32rpx;border-radius: 4rpx;background: #fff7e6;">
                 <view style="font-size: 20rpx;text-align: left;color: #f2a600;line-height: 32rpx;">
@@ -53,14 +53,15 @@
             </view>
             <!-- 右边部分 -->
             <view
-                style="margin-left: auto;display: flex;flex-direction: column;justify-content: space-between;align-items: center;gap: 18rpx;">
+                style="margin-left: auto;display: flex;flex-direction: column;justify-content: space-between;align-items: center;gap: 18rpx;"
+				@click="openPage('/pages/my/fyJl?usId='+item.usId+'&usNick='+item.nick,2)">
               <view style="width: 144rpx;height: 52rpx;border-radius: 26rpx;background: #fff2d6;">
                 <view
                     style="font-weight: 700;font-size: 22rpx;text-align: center;color: #f2a600;line-height: 52rpx;">
-                  开单记录
+                  分佣记录
                 </view>
               </view>
-              <view style="display: flex;align-items: flex-end;">
+              <view style="display: flex;align-items: flex-end;" @click="openPage('/pages/my/team?usId='+item.usId+'&usNick='+item.nick,2)">
                 <view style="font-size: 24rpx;text-align: center;color: #999;">
                   查看团队
                 </view>
@@ -104,7 +105,7 @@
               </view>
               <view
                   style="font-size: 24rpx;text-align: left;color: #333;font-weight: 700;margin-top: 5rpx;">
-                {{ item.teamCount }}
+                {{ item.teamCount?item.teamCount:0 }}
               </view>
             </view>
           </view>
@@ -113,9 +114,11 @@
 
 
     </scroll-view>
+	<u-loadmore :status="loadStatus" @loadmore="getList"></u-loadmore>
 
 
     <view
+		v-if="!params.id"
         style="position: absolute;padding: 30rpx 40rpx 50rpx 40rpx;border-radius: 20rpx 20rpx 0 0;background-color: #fff;bottom: 0;width: 100vw;">
       <view style="display: flex;justify-content: space-between;">
         <view @click="openPage('/pages/my/goodsTgDt',1)"
@@ -151,67 +154,96 @@ export default {
       count:0,
       tCount:0,
       teamList:[
-        {
-          "usId": 1,
-          "avatar": "avatar1.jpg",
-          "nick": "小明",
-          "createTime": 1656855000000,
-          "vipLevel": 0,
-          "amount": 1000.00,
-          "todayAmount": 200.00,
-          "totalAmount": 5000.00,
-          "count": 10,
-          "teamCount": 50
-        },
-        {
-          "usId": 2,
-          "avatar": "avatar2.jpg",
-          "nick": "小红",
-          "createTime": 1656855700000,
-          "vipLevel": 1,
-          "amount": 1500.50,
-          "todayAmount": 300.75,
-          "totalAmount": 8000.25,
-          "count": 15,
-          "teamCount": 75
-        },
-        {
-          "usId": 3,
-          "avatar": "avatar3.jpg",
-          "nick": "阿狸",
-          "createTime": 1656856400000,
-          "vipLevel": 2,
-          "amount": 2000.25,
-          "todayAmount": 250.50,
-          "totalAmount": 10000.50,
-          "count": 20,
-          "teamCount": 100
-        },
-        {
-          "usId": 4,
-          "avatar": "avatar4.jpg",
-          "nick": "小青",
-          "createTime": 1656857100000,
-          "vipLevel": 3,
-          "amount": 2500.75,
-          "todayAmount": 400.00,
-          "totalAmount": 12000.75,
-          "count": 25,
-          "teamCount": 120
-        }
-      ]
+        // {
+        //   "usId": 1,
+        //   "avatar": "avatar1.jpg",
+        //   "nick": "小明",
+        //   "createTime": 1656855000000,
+        //   "vipLevel": 0,
+        //   "amount": 1000.00,
+        //   "todayAmount": 200.00,
+        //   "totalAmount": 5000.00,
+        //   "count": 10,
+        //   "teamCount": 50
+        // },
+        // {
+        //   "usId": 2,
+        //   "avatar": "avatar2.jpg",
+        //   "nick": "小红",
+        //   "createTime": 1656855700000,
+        //   "vipLevel": 1,
+        //   "amount": 1500.50,
+        //   "todayAmount": 300.75,
+        //   "totalAmount": 8000.25,
+        //   "count": 15,
+        //   "teamCount": 75
+        // },
+        // {
+        //   "usId": 3,
+        //   "avatar": "avatar3.jpg",
+        //   "nick": "阿狸",
+        //   "createTime": 1656856400000,
+        //   "vipLevel": 2,
+        //   "amount": 2000.25,
+        //   "todayAmount": 250.50,
+        //   "totalAmount": 10000.50,
+        //   "count": 20,
+        //   "teamCount": 100
+        // },
+        // {
+        //   "usId": 4,
+        //   "avatar": "avatar4.jpg",
+        //   "nick": "小青",
+        //   "createTime": 1656857100000,
+        //   "vipLevel": 3,
+        //   "amount": 2500.75,
+        //   "todayAmount": 400.00,
+        //   "totalAmount": 12000.75,
+        //   "count": 25,
+        //   "teamCount": 120
+        // }
+      ],
+	  params: {
+		id:'',
+	  	pageNo: 0,
+	  	pageSize: 10,
+	  },
+	  loadStatus: 'loadmore',
     }
   },
   onLoad(e){
-    this.teamCount()
-    this.teamInfo()
+	  if(e.usId) {
+		  this.params.id = e.usId;
+	  }
+	  if(e.usNick) {
+		  uni.setNavigationBarTitle({
+		  	title: e.usNick+"的团队"
+		  });
+	  }
+	  this.teamCount()
+	  this.search();
   },
   methods: {
-    teamInfo(){
+	search(){
+		this.teamList = [];
+		this.params.pageNo = 0;
+		this.loadStatus = 'loadmore';
+		this.getList();
+	},  
+    getList(){
+		if(this.loadStatus != 'loadmore') return;
+		this.loadStatus = 'loading';
+		this.params.pageNo += 1;
       this.$request.post({
         url: 'user/userRoyalFlowPro/tenantTeam',
+		params: this.params,
         success: (result) => {
-          // this.teamList=result
+			if(result.length < this.params.pageSize) {
+				this.loadStatus = 'nomore';
+			}else {
+				this.loadStatus = 'loadmore';
+			}
+			this.teamList = [...this.teamList, ...result];
         },
         catch: (e) => {
 
@@ -224,6 +256,9 @@ export default {
     teamCount(id) {
       this.$request.post({
         url: 'user/userRoyalFlowPro/tenantTeamCount',
+		params: {
+			id: this.params.id
+		},
         success: (result) => {
           this.count=result.count
           this.tCount=result.teamCount
