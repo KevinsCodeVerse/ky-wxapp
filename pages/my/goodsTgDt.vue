@@ -255,16 +255,18 @@ export default {
 	this.getShareImgList();
   },
   onShareAppMessage(res) {
-      let id = uni.getStorageSync('usId'); // 分享产品的Id
+      let parentId = uni.getStorageSync('usId'); // 分享产品的用户Id
+	  let id = uni.getStorageSync('infoId');
+	  let shopId = uni.getStorageSync('shopId');
       if (res.from === 'button') {
           // 来自页面内转发按钮
           console.log(res.target);
       }
-	  console.log('id', id);
+	  console.log('parentId', parentId);
 	  console.log('this.indexs', this.indexs);
       return {
           title: this.message,
-          path: `pages/login/index?parentId=${id}`,
+          path: `pages/login/index?parentId=${parentId}&id=${id}&shopId=${shopId}`,
           // 分享后打开的页面
           imageUrl: this.$comm.fullPath(this.shareImgList[this.indexs])
       };

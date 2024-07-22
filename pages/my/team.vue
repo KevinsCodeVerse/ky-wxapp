@@ -111,10 +111,11 @@
           </view>
         </view>
       </view>
-
+	<u-empty v-if="teamList.length==0" icon-size="550rpx" src="../../../static/index/noEmty.png" text=" "></u-empty>
 
     </scroll-view>
-	<u-loadmore :status="loadStatus" @loadmore="getList"></u-loadmore>
+	
+	<u-loadmore :status="loadStatus" @loadmore="getList" v-if="teamList.length>0"></u-loadmore>
 
 
     <view

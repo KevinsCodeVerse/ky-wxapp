@@ -84,8 +84,9 @@
 
 
 				</view>
+				<u-empty v-if="list.length==0" icon-size="550rpx" src="../../../static/index/noEmty.png" text=" "></u-empty>
 			</scroll-view>
-			<u-loadmore :status="loadStatus" @loadmore="getList"></u-loadmore>
+			<u-loadmore :status="loadStatus" @loadmore="getList" v-if="list.length>0"></u-loadmore>
 		</view>
 
 		<!-- 底部bar -->
