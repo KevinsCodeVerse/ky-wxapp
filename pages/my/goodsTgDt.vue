@@ -14,7 +14,7 @@
       </view>
       <view style="display: flex;gap: 20rpx;align-items: center;">
         <view>
-          <u-image width="96rpx" height="96rpx" :src="from.avatar"
+          <u-image width="96rpx" height="96rpx" :src="$comm.fullPath(from.avatar)"
                    shape="circle"></u-image>
         </view>
         <view style="display: flex;flex-direction: column;">

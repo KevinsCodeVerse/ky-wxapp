@@ -38,7 +38,7 @@
 			}
 		},
 		methods: {
-openPage(path, type) {
+			openPage(path, type) {
 				if (!path) {
 					uni.navigateBack({
 						delta: 1
