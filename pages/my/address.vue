@@ -10,7 +10,7 @@
 		<scroll-view class="address-list" scroll-y="true">
 			<block v-if="addresses.length">
 				<block v-for="(address, index) in addresses" :key="index">
-					<view class="address-item" @click="isManage ? selectAddress(index) : null">
+					<view class="address-item" @click="isManage ? selectAddress(index) : handleAddressClick(address)">
 						<view v-if="isManage" class="select-checkbox">
 							<u-checkbox v-model="address.isSelected" shape="circle" active-color="#002FA7" />
 						</view>
@@ -24,7 +24,6 @@
 							<view class="address-bottom">
 								<view class="address-box">
 									<view class="address">{{ address.address }}</view>
-									<u-icon @click="editAddress(address)" v-if="!isManage" name="arrow-right" size="32rpx"></u-icon>
 								</view>
 								<view v-if="!isManage" class="line"></view>
 								<view v-if="!isManage" class="set-default">
@@ -32,7 +31,10 @@
 										<radio color="#002FA7" :checked="address.isDefault" />
 										<text class="default">设为默认地址</text>
 									</view>
-									<view class="delete" @click.stop="deleteAddress(address)">删除</view>
+									<view class="address-box">
+										<view class="" @click.stop="editAddress(address)">编辑</view>
+										<view class="delete" @click.stop="deleteAddress(address)">删除</view>
+									</view>
 								</view>
 							</view>
 						</view>
@@ -41,9 +43,9 @@
 			</block>
 			<u-empty v-else icon-size="550rpx" src="../../../static/index/noEmty.png" text=" " class="center-empty"></u-empty>
 		</scroll-view>
-		<view @click="isManage ? deleteSelectedAddresses() : addAddress()">
+		<view @click="isManage ? deleteSelectedAddresses() : handleBottomButtonClick()">
 			<button :class="['add-address', isManage && hasSelected ? 'delete-address' : '', isManage && !hasSelected ? 'disabled-btn' : '']" :disabled="isManage && !hasSelected">
-				{{ isManage ? '删除' : '添加收货地址' }}
+				{{ bottomButtonText }}
 			</button>
 		</view>
 	</view>
@@ -58,7 +60,10 @@ export default {
 				pageNo: 1,
 				pageSize: 200
 			},
-			addresses: []
+			addresses: [],
+			selectAddressData: null,
+			isSelectMode: false,
+			bottomButtonText: '添加收货地址'
 		};
 	},
 	computed: {
@@ -66,7 +71,11 @@ export default {
 			return this.addresses.some((address) => address.isSelected);
 		}
 	},
-	onLoad() {
+	onLoad(options) {
+		if (options.type === '1') {
+			this.isSelectMode = true;
+			this.bottomButtonText = '确认';
+		}
 		this.getAddressList();
 	},
 	onShow() {
@@ -82,7 +91,6 @@ export default {
 						address.isSelected = false;
 						return address;
 					});
-					console.log('地址', res);
 				}
 			});
 		},
@@ -173,6 +181,46 @@ export default {
 					this.getAddressList();
 				}
 			});
+		},
+		handleBottomButtonClick() {
+			if (this.isSelectMode) {
+				this.confirmSelectedAddress();
+			} else {
+				this.addAddress();
+			}
+		},
+		handleAddressClick(address) {
+			if (this.isSelectMode) {
+				this.selectAddressForConfirmation(address);
+			}
+		},
+		selectAddressForConfirmation(row) {
+			const query = JSON.stringify(row);
+			this.selectAddressData = query;
+			const pages = getCurrentPages();
+			const previousPage = pages[pages.length - 2]; // 获取上一页实例
+			// 传递数据到上一页
+			previousPage.setData({
+				selectedAddress: row
+			});
+			uni.navigateBack(1);
+		},
+		confirmSelectedAddress() {
+			if (this.selectAddressData) {
+				const row = JSON.parse(this.selectAddressData);
+				const pages = getCurrentPages();
+				const previousPage = pages[pages.length - 2]; // 获取上一页实例
+				// 传递数据到上一页
+				previousPage.setData({
+					selectedAddress: row
+				});
+				uni.navigateBack(1);
+			} else {
+				uni.showToast({
+					title: '请选择一个地址',
+					icon: 'none'
+				});
+			}
 		}
 	}
 };
@@ -291,8 +339,9 @@ export default {
 	color: #007aff;
 }
 .delete {
-	font-size: 26rpx;
+	font-size: 28rpx;
 	color: #f24848;
+	margin: 0 20rpx;
 }
 .add-address {
 	position: fixed;

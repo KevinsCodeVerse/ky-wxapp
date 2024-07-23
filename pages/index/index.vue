@@ -10,7 +10,7 @@
 			<view class="top">
 				<view class="box">
 					<view class="avatar">
-						<image class="avatar" :src="$comm.fullPath(shop.tenantShop.icon) || ''"></image>
+						<image class="avatar" :src="$comm.fullPath(shop.tenantShop.shopPhoto) || ''"></image>
 					</view>
 					<view class="info">
 						<view class="title">{{ shop.tenantShop.name }}</view>
@@ -291,7 +291,7 @@ export default {
 	}
 
 	&-swiper {
-		padding: 35rpx 25rpx 25rpx 25rpx;
+		padding: 35rpx 0;
 	}
 
 	&-waterfall {

@@ -232,8 +232,11 @@ export default {
 		},
 		toSelectAddress() {
 			uni.navigateTo({
-				url: '/pages/shop/selectAddress'
+				url: '/pages/my/address?type=1'
 			});
+			// uni.navigateTo({
+			// 	url: '/pages/shop/selectAddress'
+			// });
 		}
 	}
 };

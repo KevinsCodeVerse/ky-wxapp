@@ -69,7 +69,12 @@
 		<view class="order-footer">
 			<view>实付: ￥{{ orderDetail.payAmount }}</view>
 			<view>
-				<button v-for="(button, index) in getButtons(orderDetail.status)" :key="index" :class="button.class" @click="handleAction(button.action, orderDetail)">
+				<button
+					v-for="(button, index) in getButtons(orderDetail.status, orderDetail.payType)"
+					:key="index"
+					:class="button.class"
+					@click="handleAction(button.action, orderDetail)"
+				>
 					{{ button.text }}
 				</button>
 			</view>
@@ -89,6 +94,7 @@ export default {
 	},
 	onLoad(options) {
 		const orderId = options.orderId;
+		this.orderId = orderId;
 		this.fetchOrderDetail(orderId);
 	},
 	methods: {
@@ -114,7 +120,7 @@ export default {
 			this.summaryFields = [
 				{ label: '订单生成时间', value: this.orderDetail.createTime },
 				{ label: '支付时间', value: this.orderDetail.payTime || '-' },
-				{ label: '交易完成时间', value: this.orderDetail.completeTime || '-' }
+				{ label: '交易完成时间', value: this.orderDetail.receivingTime || '-' }
 			];
 		},
 		getStatusText(status) {
@@ -138,7 +144,7 @@ export default {
 		getStatusDesc(status) {
 			switch (status) {
 				case 0:
-					return '系统将在47:59:59后自动关闭，请尽快支付';
+					return '系统将自动关闭，请尽快支付';
 				case 1:
 					return '您已成功下单，请耐心等待商家发货';
 				case 2:
@@ -171,25 +177,45 @@ export default {
 					return '';
 			}
 		},
-		getButtons(status) {
-			switch (status) {
-				case 0:
-					return [
-						{ text: '取消订单', action: 'cancel', class: 'default-button' },
-						{ text: '去支付', action: 'pay', class: 'primary-button' }
-					];
-				case 1:
-					return [{ text: '取消订单', action: 'cancel', class: 'default-button' }];
-				case 2:
-					return [{ text: '确认收货', action: 'confirmReceipt', class: 'primary-button' }];
-				case 3:
-					return [{ text: '申请售后', action: 'applyAfterSale', class: 'default-button' }];
-				case 4:
-					return [{ text: '申请退货', action: 'applyReturn', class: 'default-button' }];
-				case -1:
-					return [{ text: '再来一单', action: 'reorder', class: 'default-button' }];
-				default:
-					return [];
+		getButtons(status, payType) {
+			if (payType === 2) {
+				// 如果是线下订单，不显示“支付订单”按钮
+				switch (status) {
+					case 0:
+					// return [{ text: '取消订单', action: 'cancel', class: 'default-button' }];
+					case 1:
+					// return [{ text: '取消订单', action: 'cancel', class: 'default-button' }];
+					case 2:
+						return [{ text: '确认收货', action: 'confirmReceipt', class: 'primary-button' }];
+					case 3:
+					// return [{ text: '申请售后', action: 'applyAfterSale', class: 'default-button' }];
+					case 4:
+					// return [{ text: '申请退货', action: 'applyReturn', class: 'default-button' }];
+					case -1:
+						return [{ text: '再来一单', action: 'reorder', class: 'default-button' }];
+					default:
+						return [];
+				}
+			} else {
+				switch (status) {
+					case 0:
+						return [
+							// { text: '取消订单', action: 'cancel', class: 'default-button' },
+							{ text: '去支付', action: 'pay', class: 'primary-button' }
+						];
+					case 1:
+						// 	return [{ text: '取消订单', action: 'cancel', class: 'default-button' }];
+						// case 2:
+						return [{ text: '确认收货', action: 'confirmReceipt', class: 'primary-button' }];
+					case 3:
+					// return [{ text: '申请售后', action: 'applyAfterSale', class: 'default-button' }];
+					// case 4:
+					// 	return [{ text: '申请退货', action: 'applyReturn', class: 'default-button' }];
+					case -1:
+						return [{ text: '再来一单', action: 'reorder', class: 'default-button' }];
+					default:
+						return [];
+				}
 			}
 		},
 		handleAction(action, item) {
@@ -229,7 +255,20 @@ export default {
 			console.log('View logistics', item);
 		},
 		confirmReceipt(item) {
-			console.log('Confirm receipt', item);
+			console.log('确认收货', item);
+			this.$request.post({
+				url: 'user/userOrder/confirmReceipt',
+				params: {
+					orderId: item.orderId
+				},
+				success: (res) => {
+					uni.showToast({
+						title: '收货成功',
+						icon: 'success'
+					});
+					this.fetchOrderDetail(this.orderId);
+				}
+			});
 		},
 		applyAfterSale(item) {
 			console.log('Apply after sale', item);

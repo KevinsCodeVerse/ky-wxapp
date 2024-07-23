@@ -25,7 +25,7 @@
 						<view class="order-total">实付: ￥{{ order.payAmount }}</view>
 						<view class="order-actions">
 							<button
-								v-for="(button, index) in getButtons(order.status)"
+								v-for="(button, index) in getButtons(order.status, order.payType)"
 								:key="index"
 								:class="['order-button', getButtonClass(button)]"
 								@click="handleButtonClick(button, order)"
@@ -146,23 +146,44 @@ export default {
 					return '';
 			}
 		},
-		getButtons(status) {
-			switch (status) {
-				case 0:
-					return ['取消订单', '支付订单'];
-				case 1:
-					// return ['订单详情', '取消订单'];
-					return ['订单详情'];
-				case 2:
-					return ['订单详情', '确认收货'];
-				case 3:
-					return ['订单详情', '申请售后'];
-				case 4:
-					return ['订单详情', '再来一单'];
-				case -1:
-					return ['订单详情', '再来一单'];
-				default:
-					return [];
+		getButtons(status, payType) {
+			// 如果是线下订单（payType === 2），不显示“支付订单”按钮
+			if (payType === 2) {
+				switch (status) {
+					case 0:
+						return ['订单详情'];
+					case 1:
+						return ['订单详情'];
+					case 2:
+						return ['订单详情', '确认收货'];
+					case 3:
+						return ['订单详情'];
+					// return ['订单详情', '申请售后'];
+					case 4:
+						return ['订单详情', '再来一单'];
+					case -1:
+						return ['订单详情', '再来一单'];
+					default:
+						return [];
+				}
+			} else {
+				switch (status) {
+					case 0:
+						return ['取消订单', '支付订单'];
+					case 1:
+						return ['订单详情'];
+					case 2:
+						return ['订单详情', '确认收货'];
+					case 3:
+						return ['订单详情'];
+					// return ['订单详情', '申请售后'];
+					case 4:
+						return ['订单详情', '再来一单'];
+					case -1:
+						return ['订单详情', '再来一单'];
+					default:
+						return [];
+				}
 			}
 		},
 		getButtonClass(button) {
@@ -222,7 +243,22 @@ export default {
 			});
 		},
 		confirmReceipt(item) {
-			console.log('确认收货', item);
+			this.hasMore = true;
+
+			this.$request.post({
+				url: 'user/userOrder/confirmReceipt',
+				params: {
+					orderId: item.orderId
+				},
+				success: (res) => {
+					uni.showToast({
+						title: '收货成功',
+						icon: 'success'
+					});
+					this.pageNo = 1;
+					this.loadOrders();
+				}
+			});
 			// 这里添加确认收货的逻辑
 		},
 		requestAfterSale(item) {

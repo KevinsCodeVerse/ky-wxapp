@@ -1,16 +1,6 @@
 <template>
-	<view class="login" :style="{ backgroundImage: 'url(' + background + ')' }">
-		<view class="logo">
-			<image src="/static/navs/index.png"></image>
-		</view>
-		<view class="handle">
-			<button class="mybtn btn" open-type="getUserInfo" @tap="getUserProfile">微信授权登录</button>
-			<!-- <navigator class="mybtn btn" url="/pages/register/index">手机号登录注册</navigator> -->
-			<!-- <view class="protocol">
-				<text>登录代表您已同意</text>
-				<navigator url="/pages/protocol/index">《用户协议》</navigator>
-			</view> -->
-		</view>
+	<view class="login">
+		<button class="mybtn btn" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录</button>
 	</view>
 </template>
 
@@ -18,7 +8,6 @@
 export default {
 	data() {
 		return {
-			background: '/static/navs/index.png',
 			userInfo: {},
 			parentId: '',
 			shopId: '',
@@ -67,6 +56,64 @@ export default {
 		if (options.agentId) uni.setStorageSync('agentIdoptions', options);
 	},
 	methods: {
+		getPhoneNumber(e) {
+			this.$request.post({
+				url: 'wx/ma/user/phone',
+				params: {
+					code: e.target.code
+				},
+				success: (result) => {
+					uni.login({
+						provider: 'weixin',
+						success: (res) => {
+							console.log('login', res);
+							if (res.code) {
+								this.$request.post({
+									url: 'wx/ma/user/public/login',
+									params: {
+										code: res.code,
+										phone: this.phone
+									},
+									success: (result) => {
+										console.log('result', result);
+										uni.setStorageSync('login', result);
+										uni.setStorageSync('token', result.token);
+										uni.setStorageSync('phone', this.phone);
+										uni.setStorageSync('avatar', result.info.avatar);
+										uni.setStorageSync('name', result.info.nick);
+										this.encryption = result.encryption;
+										this.handleScanParams();
+									},
+									allError: (err) => {
+										console.log(err);
+									},
+									fail: (err) => {
+										uni.hideLoading();
+										uni.showToast({
+											title: '授权失败',
+											icon: 'none'
+										});
+									}
+								});
+							} else {
+								uni.hideLoading();
+								uni.showToast({
+									title: '授权失败',
+									icon: 'none'
+								});
+							}
+						},
+						fail: (err) => {
+							uni.hideLoading();
+							uni.showToast({
+								title: '授权失败',
+								icon: 'none'
+							});
+						}
+					});
+				}
+			});
+		},
 		getUserProfile() {
 			uni.login({
 				provider: 'weixin',
@@ -80,6 +127,7 @@ export default {
 								phone: this.phone
 							},
 							success: (result) => {
+								console.log('result', result);
 								uni.setStorageSync('login', result);
 								uni.setStorageSync('token', result.token);
 								uni.setStorageSync('phone', this.phone);
@@ -157,19 +205,6 @@ export default {
 				}
 			});
 		},
-		toLogin() {
-			this.$request.post({
-				url: 'user/info/public/authority',
-				params: {
-					account: rsa.cryptStr('15797735521'),
-					password: rsa.cryptStr('123456')
-				},
-				success: (res) => {
-					console.log(res.token);
-					uni.setStorageSync('token', res.token);
-				}
-			});
-		},
 		goCancel() {
 			uni.navigateBack({
 				delta: 1
@@ -190,41 +225,33 @@ export default {
 
 <style scoped>
 .login {
+	display: flex;
+	justify-content: center;
+	align-items: center;
 	min-height: 100vh;
-	background-color: #4f90f8;
-	background-repeat: no-repeat;
-	background-size: 100% auto;
+	background-color: #f8f8f8; /* 柔和的背景颜色 */
 	text-align: center;
 }
-.logo image {
-	width: 300rpx;
-	height: 310rpx;
-	margin-top: 30%;
-	margin-bottom: 30%;
-}
-.handle {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-}
+
 .btn {
 	display: flex;
 	align-items: center;
 	justify-content: center;
 	height: 86rpx;
 	width: 480rpx;
-	color: #3994ff;
-	background-color: #fff;
+	color: #ffffff; /* 按钮文字颜色 */
+	background-color: #333333; /* 按钮背景颜色 */
 	font-size: 32rpx;
-	border-radius: 84rpx;
+	border-radius: 42rpx; /* 边框半径 */
 	margin-bottom: 30rpx;
+	box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.2); /* 添加阴影 */
 }
-.handle .protocol {
-	display: flex;
-	color: #fff59a;
-	font-size: 24rpx;
+
+.btn:hover {
+	background-color: #2c2c2c; /* 按钮悬停颜色 */
 }
-.handle text {
-	color: #fff;
+
+.btn:active {
+	background-color: #1f1f1f; /* 按钮激活颜色 */
 }
 </style>
