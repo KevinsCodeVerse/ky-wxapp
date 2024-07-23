@@ -51,10 +51,14 @@
 		<!-- 底部按钮 -->
 		<view class="bottom-bar">
 			<view class="bottom-bar-item">
-				<u-icon name="share" size="48rpx" color="#666"></u-icon>
-				<text>分享</text>
+				<u-button open-type="share" :custom-style="customStyle">
+					<u-icon name="share" size="48rpx" color="#666"></u-icon>
+					<text>分享</text>
+				</u-button>
+				<!-- <u-icon name="share" size="48rpx" color="#666"></u-icon>
+				<text>分享</text> -->
 			</view>
-			<view class="bottom-bar-item">
+			<view class="bottom-bar-item" @click="toCart">
 				<u-icon name="shopping-cart" size="48rpx" color="#666"></u-icon>
 				<text>购物车</text>
 			</view>
@@ -120,6 +124,12 @@
 export default {
 	data() {
 		return {
+			customStyle:{
+				'all': 'unset',
+				'display': 'flex',
+				'flex-direction': 'column',
+				'align-items': 'center',
+			},
 			pro: {
 				id: null,
 				banner: '',
@@ -146,6 +156,21 @@ export default {
 		const id = options.id;
 		this.getShopDetail(id);
 	},
+	onShareAppMessage(res) {
+	    let parentId = uni.getStorageSync('usId'); // 分享产品的用户Id
+		let id = uni.getStorageSync('infoId');
+		 let shopId = uni.getStorageSync('shopId');
+	    if (res.from === 'button') {
+	        // 来自页面内转发按钮
+	        console.log(res.target);
+	    }
+	    return {
+	        title: this.pro.name,
+	        path: `pages/login/index?parentId=${parentId}&id=${id}&shopId=${shopId}`,
+	        // 分享后打开的页面
+	        imageUrl: this.$comm.fullPath(this.pro.banner)
+	    };
+	},
 	computed: {
 		groupedSpecList() {
 			const groups = this.specList.reduce((acc, spec) => {
@@ -169,6 +194,11 @@ export default {
 		}
 	},
 	methods: {
+		toCart(){
+			uni.switchTab({
+				url: "/pages/shoppingCart/index"
+			})
+		},
 		getShopDetail(id) {
 			this.$request.post({
 				url: 'user/userShopCar/proDetail',

@@ -54,18 +54,19 @@
             <!-- 右边部分 -->
             <view
                 style="margin-left: auto;display: flex;flex-direction: column;justify-content: space-between;align-items: center;gap: 18rpx;"
-				@click="openPage('/pages/my/fyJl?usId='+item.usId+'&usNick='+item.nick,2)">
+				>
               <view style="width: 144rpx;height: 52rpx;border-radius: 26rpx;background: #fff2d6;">
                 <view
+				@click="openPage('/pages/my/fyJl?usId='+item.usId+'&usNick='+item.nick,2)"
                     style="font-weight: 700;font-size: 22rpx;text-align: center;color: #f2a600;line-height: 52rpx;">
                   分佣记录
                 </view>
               </view>
-              <view style="display: flex;align-items: flex-end;" @click="openPage('/pages/my/team?usId='+item.usId+'&usNick='+item.nick,2)">
-                <view style="font-size: 24rpx;text-align: center;color: #999;">
+              <view style="display: flex;align-items: flex-end;">
+                <view style="font-size: 24rpx;text-align: center;color: #999;" @click="openPage('/pages/my/team?usId='+item.usId+'&usNick='+item.nick,2)">
                   查看团队
                 </view>
-                <view>
+                <view @click="openPage('/pages/my/team?usId='+item.usId+'&usNick='+item.nick,2)">
                   <u-icon name="arrow-right" size="18rpx" color="#999"></u-icon>
                 </view>
               </view>
