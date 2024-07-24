@@ -63,7 +63,7 @@
 					</view>
 				</view>
 			</view>
-			<u-loadmore bg-color="rgb(240, 240, 240)" :status="loadStatus" @loadmore="onLoadMore"></u-loadmore>
+			<u-loadmore bg-color="#fff" :status="loadStatus" @loadmore="onLoadMore"></u-loadmore>
 		</view>
 	</view>
 </template>
@@ -248,7 +248,7 @@ export default {
 <style lang="scss" scoped>
 .vmb {
 	&-container {
-		background: #f5f5f5;
+		background: #fff;
 		position: relative;
 		.scroll-to-top {
 			position: fixed;

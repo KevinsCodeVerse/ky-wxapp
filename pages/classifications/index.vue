@@ -362,7 +362,7 @@ export default {
 }
 
 .right-box {
-	background-color: rgb(250, 250, 250);
+	background-color: #fff;
 }
 
 .page-view {

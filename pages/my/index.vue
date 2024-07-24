@@ -1,6 +1,6 @@
 <template>
 	<view class="vmb-container">
-		<view class="vmb-my-header">
+		<view class="vmb-my-header" :style="!vipInfo.vipName ? 'height: 200rpx' : ''">
 			<view class="flex">
 				<view class="u-flex">
 					<view class="u-m-r-10" @click="chooseAvatar">
@@ -9,21 +9,21 @@
 					<view>
 						<input class="name-input" v-if="editingName" v-model="name" @blur="saveName" @keyup.enter="saveName" ref="nameInput" />
 						<view v-else class="name" @click="editName">{{ name }}</view>
-						<view class="vip">普通会员</view>
+						<view class="vip">{{ vipInfo.vipName }}</view>
 					</view>
 				</view>
 
 				<view class="right">
 					<view class="money">账户余额</view>
-					<view class="num">88880999</view>
+					<view class="num">{{ vipInfo.vipSavingsCard }}</view>
 				</view>
 			</view>
-			<view class="vip-show">
+			<view v-if="vipInfo.vipName" class="vip-show">
 				<view class="line"></view>
 				<view class="flex">
-					<view class="">权益：商品消费打9折</view>
+					<view class="">权益：商品消费打{{ vipInfo.vipDiscountRatio }}折</view>
 					<view class="">
-						<view class="">剩余365天</view>
+						<view class="">剩余{{ vipInfo.dueTime }}天</view>
 					</view>
 				</view>
 			</view>
@@ -47,8 +47,7 @@
 					<view @click="toOrder(3)" class="img-box">
 						<view class="img">
 							<u-image src="@/static/my/car.png" width="60rpx" height="60rpx" />
-							<view class="badge">5</view>
-							<!-- 右上角的小圆点 -->
+							<view v-if="waitReceiveCount > 0" class="badge">{{ waitReceiveCount }}</view>
 						</view>
 						<view>待收货</view>
 					</view>
@@ -62,7 +61,7 @@
 			</view>
 		</view>
 
-		<view class="main">
+		<view class="main-view">
 			<view>
 				<u-cell-group>
 					<u-cell-item @tap="openPage('pages/my/address')" title="地址管理">
@@ -102,12 +101,21 @@ export default {
 			name: '',
 			phone: '',
 			avatar: '',
-
-			editingName: false
+			editingName: false,
+			infoId: '',
+			waitReceiveCount: 0,
+			vipInfo: {
+				vipName: '',
+				vipDiscountRatio: '',
+				vipSavingsCard: 0,
+				dueTime: 0
+			}
 		};
 	},
 	onLoad() {
 		this.getInfo();
+		this.getShopInfo();
+		this.getOrderCount();
 	},
 	methods: {
 		getInfo() {
@@ -123,143 +131,34 @@ export default {
 				}
 			});
 		},
-		toOrder(status) {
-			uni.navigateTo({
-				url: `/pages/orderList/order?status=${status}`
-			});
-		},
-		openPage(path) {
-			this.$u.route({
-				url: path
-			});
-		},
-		chooseAvatar() {
-			uni.chooseImage({
-				count: 1,
-				sizeType: ['compressed'],
-				sourceType: ['album', 'camera'],
-				success: (res) => {
-					const filePath = res.tempFilePaths[0];
-
-					// 将 filePath 转换为 Base64 并上传文件
-					this.convertToBase64(filePath)
-						.then((base64) => {
-							this.uploadBase64(base64);
-						})
-						.catch((err) => {
-							console.log('err', err);
-							uni.showToast({
-								title: '转换文件失败',
-								icon: 'none'
-							});
-						});
-				},
-				fail: (err) => {
-					console.log('err', err);
-				}
-			});
-		},
-
-		convertToBase64(filePath) {
-			return new Promise((resolve, reject) => {
-				const fs = wx.getFileSystemManager();
-				fs.readFile({
-					filePath: filePath,
-					encoding: 'base64',
-					success: (res) => {
-						resolve(`data:image/jpeg;base64,${res.data}`);
-					},
-					fail: (err) => {
-						reject(err);
-					}
-				});
-			});
-		},
-
-		uploadBase64(base64) {
+		getShopInfo() {
+			const infoId = uni.getStorageSync('infoId');
 			this.$request.post({
-				url: 'wx/ma/user/editInfo',
+				url: 'user/userInfo/getTenantUser',
 				params: {
-					nick: this.name,
-					avatar: base64
+					infoId
 				},
 				success: (res) => {
-					if (res.avatar) {
-						const newAvatar = res.avatar.replace(/^.*\/files/, '/files');
-						this.avatar = newAvatar;
-						uni.setStorageSync('avatar', newAvatar);
-					}
-					uni.showToast({
-						title: '上传头像成功',
-						icon: 'success'
-					});
-					this.getInfo();
-				},
-				fail: (err) => {
-					uni.showToast({
-						title: '上传头像失败',
-						icon: 'none'
-					});
+					console.log('res商家', res);
+					const currentDate = new Date();
+					const dueDate = new Date(res.dueTime);
+					const timeDiff = dueDate - currentDate;
+					let remainingDays = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+					this.vipInfo = {
+						vipName: res.vipName,
+						vipDiscountRatio: res.vipDiscountRatio,
+						vipSavingsCard: res.info.vipSavingsCard,
+						dueTime: remainingDays
+					};
 				}
 			});
 		},
-		editName() {
-			this.editingName = true;
-			this.$nextTick(() => {
-				this.$refs.nameInput.focus();
-			});
-		},
-		saveName() {
-			this.editingName = false;
-			uni.setStorageSync('name', this.name);
+		getOrderCount() {
 			this.$request.post({
-				url: 'wx/ma/user/editInfo',
-				params: {
-					nick: this.name
-				},
+				url: 'user/userOrder/orderCount',
 				success: (res) => {
-					uni.showToast({
-						title: '保存姓名成功',
-						icon: 'success'
-					});
-					this.getInfo();
-				},
-				fail: (err) => {
-					uni.showToast({
-						title: '保存姓名失败',
-						icon: 'none'
-					});
-				}
-			});
-		}
-	}
-};
-</script>
-<script>
-export default {
-	data() {
-		return {
-			show: true,
-			name: '',
-			phone: '',
-			avatar: '',
-			editingName: false
-		};
-	},
-	onLoad() {
-		this.getInfo();
-	},
-	methods: {
-		getInfo() {
-			this.name = uni.getStorageSync('name');
-			this.phone = uni.getStorageSync('phone');
-			this.avatar = uni.getStorageSync('avatar');
-			this.$request.post({
-				url: 'user/userInfo/getUserInfo',
-				success: (res) => {
-					this.name = res.nick;
-					this.avatar = res.avatar;
-					this.phone = res.mobile;
+					this.waitReceiveCount = res.waitReceiveCount;
+					console.log('res', res);
 				}
 			});
 		},
@@ -447,10 +346,10 @@ export default {
 		color: #664415;
 	}
 }
-.main {
-	margin-top: 40rpx;
-	padding: 0 35rpx;
-	border-radius: 20rpx;
+.main-view {
+	margin-top: 20rpx;
+	padding: 0 15rpx;
+	border-radius: 40rpx;
 }
 .flex {
 	display: flex;
@@ -459,20 +358,22 @@ export default {
 .vmb {
 	&-container {
 		background: #f5f5f5;
+		height: 100vh;
 	}
 	&-my-header {
 		box-sizing: border-box;
-		width: 100%;
 		height: 276rpx;
 		margin-bottom: 20rpx;
 		background-image: url('@/static/my/vip-bgc.png');
 		background-size: 100% 100%;
+		margin: 0 15rpx;
 		padding: 0rpx 30rpx;
 		border-radius: 20rpx;
 	}
 	&-my-nav {
-		margin-left: auto;
-		margin-right: auto;
+		margin: 15rpx;
+		// margin-left: auto;
+		// margin-right: auto;
 		background: #fff;
 		border-radius: 20rpx;
 		.nav {
@@ -513,14 +414,6 @@ export default {
 						text-align: center;
 						color: #fff;
 					}
-				}
-			}
-		}
-		::v-deep {
-			.u-grid {
-				.u-grid-item {
-					background: transparent !important;
-					color: #ffffff !important;
 				}
 			}
 		}
