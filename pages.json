@@ -111,8 +111,7 @@
 			"path": "pages/my/goodsTgDt",
 			"style": {
 				"navigationBarTitleText": "商品推广中心",
-				"enablePullDownRefresh": false,
-				"navigationStyle": "custom"
+				"enablePullDownRefresh": false
 			}
 		},
 		{
@@ -175,6 +174,14 @@
 				"enablePullDownRefresh": false,
 				"navigationBarBackgroundColor": "#4B97E6",
 				"navigationBarTextStyle": "white"
+			}
+		},
+		{
+			"path" : "pages/my/flow/flow",
+			"style" : 
+			{
+				"navigationBarTitleText" : "明细",
+				"enablePullDownRefresh" : false
 			}
 		}
 	],
