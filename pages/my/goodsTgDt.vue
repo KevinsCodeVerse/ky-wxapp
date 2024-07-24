@@ -3,15 +3,15 @@
     <view style="width: 100vw;">
       <image src="/static/my/background.png" style="width: 100vw;z-index: -1;"></image>
     </view>
-    <view style="margin: 0 36rpx;top: 0;position: absolute;">
-      <view style="margin: 95rpx 0 45rpx 0;font-weight: 700;font-size: 18px;width: 90vw;display: flex;">
-        <view @click="openPage()">
+    <view style="margin: 0 36rpx;top: 20rpx;position: absolute;">
+      <!--<view style="margin: 95rpx 0 68rpx 0;font-weight: 700;font-size: 18px;width: 90vw;display: flex;">
+         <view @click="openPage()">
           <u-icon name="arrow-left" size="35rpx"></u-icon>
         </view>
         <view style="margin: auto;">
           商品推广中心
-        </view>
-      </view>
+        </view> 
+      </view>-->
       <view style="display: flex;gap: 20rpx;align-items: center;">
         <view>
           <u-image width="96rpx" height="96rpx" :src="$comm.fullPath(from.avatar)"
@@ -57,7 +57,7 @@
         <view style="padding: 32rpx; color: #fff; position: relative;">
           <view style="display: flex; justify-content: space-between; font-size: 28rpx;">
             <view>余额</view>
-            <view style="display: flex; align-items: center;">
+            <view style="display: flex; align-items: center;" @click="openPage('pages/my/flow/flow')">
               明细
               <u-icon name="arrow-right" size="20rpx"></u-icon>
             </view>

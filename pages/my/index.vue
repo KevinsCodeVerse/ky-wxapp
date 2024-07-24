@@ -74,7 +74,7 @@
 			</view>
 			<view>
 				<u-cell-group>
-					<u-cell-item @click="openPage('pages/my/goodsTgDt')" title="商品推广">
+					<u-cell-item @click="openPage('pages/my/goodsTgDt', 2)" title="商品推广">
 						<template #icon>
 							<image src="@/static/my/my-item2.png" class="custom-icon" />
 						</template>
@@ -128,10 +128,25 @@ export default {
 				url: `/pages/orderList/order?status=${status}`
 			});
 		},
-		openPage(path) {
-			this.$u.route({
-				url: path
-			});
+		openPage(path, type) {
+			var pages = getCurrentPages() // 获取栈实例
+			let currentRoute = pages[pages.length - 1].route; // 获取当前页面路由
+			if (path === currentRoute) {
+			  return;
+			}
+			if (type == 1) {
+			  uni.redirectTo({
+			    url: path
+			  })
+			}if (type == 2) {
+			  uni.navigateTo({
+			  	url: path
+			  })
+			} else {
+			  this.$u.route({
+			    url: path
+			  });
+			}
 		},
 		chooseAvatar() {
 			uni.chooseImage({
