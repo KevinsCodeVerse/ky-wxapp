@@ -1,6 +1,9 @@
 <template>
 	<view class="login">
-		<button class="mybtn btn" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录</button>
+		<view class="content">
+			<image class="login-logo" src="@/static/index/logo.png" mode="widthFix"></image>
+			<button class="mybtn btn" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录</button>
+		</view>
 	</view>
 </template>
 
@@ -229,8 +232,19 @@ export default {
 	justify-content: center;
 	align-items: center;
 	min-height: 100vh;
-	background-color: #f8f8f8; /* 柔和的背景颜色 */
+	background-color: #f2f3f5; /* 柔和的背景颜色 */
 	text-align: center;
+}
+
+.content {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.login-logo {
+	width: 200rpx;
+	margin-bottom: 50rpx; /* 与按钮的间距 */
 }
 
 .btn {
@@ -240,18 +254,17 @@ export default {
 	height: 86rpx;
 	width: 480rpx;
 	color: #ffffff; /* 按钮文字颜色 */
-	background-color: #333333; /* 按钮背景颜色 */
+	background-color: #4a4a4a; /* 按钮背景颜色 */
 	font-size: 32rpx;
 	border-radius: 42rpx; /* 边框半径 */
-	margin-bottom: 30rpx;
 	box-shadow: 0 4rpx 8rpx rgba(0, 0, 0, 0.2); /* 添加阴影 */
 }
 
 .btn:hover {
-	background-color: #2c2c2c; /* 按钮悬停颜色 */
+	background-color: #3a3a3a; /* 按钮悬停颜色 */
 }
 
 .btn:active {
-	background-color: #1f1f1f; /* 按钮激活颜色 */
+	background-color: #2a2a2a; /* 按钮激活颜色 */
 }
 </style>
