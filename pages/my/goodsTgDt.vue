@@ -64,7 +64,7 @@
           </view>
           <view
               style="display: flex; justify-content: space-between; font-size: 64rpx; font-weight: 700; margin-top: 10rpx;">
-            <view>{{from.royal}}</view>
+            <view>{{tenantInvite.amount}}</view>
           </view>
           <view style="display: flex; justify-content: space-between; font-size: 28rpx; margin-top: 15rpx;">
             <view>冻结中：￥{{from.freezeRoyal}}</view>
@@ -247,12 +247,18 @@ export default {
 	  shareShow: false,
 	  message:'',
 	  indexs: 0,
-	  shareImgList:[]
+	  shareImgList:[],
+	  tenantInvite:{
+		  amount: 0,
+	  }
     };
   },
   onLoad() {
     this.tgInfo();
 	this.getShareImgList();
+  },
+  onShow() {
+  	this.getTenantInvite();
   },
   onShareAppMessage(res) {
       let parentId = uni.getStorageSync('usId'); // 分享产品的用户Id
@@ -272,6 +278,17 @@ export default {
       };
   },
   methods: {
+	  getTenantInvite(){
+	  	this.$request.post({
+	  		url: 'user/userRoyalFlowPro/getTenantInvite',
+	  		params: {
+	  			infoId: uni.getStorageSync("infoId"),
+	  		},
+	  		success: (res) => {
+	  			this.tenantInvite = res;
+	  		}
+	  	});
+	  },
 	  getShareImgList(){
 	  	this.$request.post({
 	  		url: 'user/sysShareImg/all',
