@@ -91,7 +91,8 @@ export default {
 			total: 0 // 总数据条目数
 		};
 	},
-	onLoad() {
+	onLoad() {},
+	onShow() {
 		this.getBindShopInfo();
 	},
 
@@ -246,6 +247,9 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+u-swiper {
+	width: 100%;
+}
 .vmb {
 	&-container {
 		background: #fff;
@@ -291,7 +295,9 @@ export default {
 	}
 
 	&-swiper {
-		padding: 35rpx 0;
+		width: 100%;
+		padding: 35rpx 20rpx;
+		margin: 0 auto;
 	}
 
 	&-waterfall {

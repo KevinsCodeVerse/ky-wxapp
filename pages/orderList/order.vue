@@ -69,6 +69,8 @@ export default {
 			this.status = parseInt(options.status);
 			this.currentTab = this.status;
 		}
+	},
+	onShow() {
 		this.loadOrders();
 	},
 	methods: {

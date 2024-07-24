@@ -112,7 +112,8 @@ export default {
 			}
 		};
 	},
-	onLoad() {
+	onLoad() {},
+	onShow() {
 		this.getInfo();
 		this.getShopInfo();
 		this.getOrderCount();

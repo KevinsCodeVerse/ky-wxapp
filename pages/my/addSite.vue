@@ -150,10 +150,10 @@ export default {
 						});
 						if (this.type == 1) {
 							setTimeout(() => {
-								uni.navigateBack(1);
+								uni.navigateBack();
 							}, 1000);
 						}
-						uni.navigateBack();
+
 						this.restForm();
 					},
 					fail: (err) => {
