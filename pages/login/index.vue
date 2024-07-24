@@ -59,64 +59,115 @@ export default {
 		if (options.agentId) uni.setStorageSync('agentIdoptions', options);
 	},
 	methods: {
+		// 暂时使用微信授权登录
 		getPhoneNumber(e) {
-			this.$request.post({
-				url: 'wx/ma/user/phone',
-				params: {
-					code: e.target.code
-				},
-				success: (result) => {
-					uni.login({
-						provider: 'weixin',
-						success: (res) => {
-							console.log('login', res);
-							if (res.code) {
-								this.$request.post({
-									url: 'wx/ma/user/public/login',
-									params: {
-										code: res.code,
-										phone: this.phone
-									},
-									success: (result) => {
-										console.log('result', result);
-										uni.setStorageSync('login', result);
-										uni.setStorageSync('token', result.token);
-										uni.setStorageSync('phone', this.phone);
-										uni.setStorageSync('avatar', result.info.avatar);
-										uni.setStorageSync('name', result.info.nick);
-										this.encryption = result.encryption;
-										this.handleScanParams();
-									},
-									allError: (err) => {
-										console.log(err);
-									},
-									fail: (err) => {
-										uni.hideLoading();
-										uni.showToast({
-											title: '授权失败',
-											icon: 'none'
-										});
-									}
-								});
-							} else {
+			uni.login({
+				provider: 'weixin',
+				success: (res) => {
+					console.log('login', res);
+					if (res.code) {
+						this.$request.post({
+							url: 'wx/ma/user/public/login',
+							params: {
+								code: res.code,
+								phone: this.phone
+							},
+							success: (result) => {
+								console.log('result', result);
+								uni.setStorageSync('login', result);
+								uni.setStorageSync('token', result.token);
+								uni.setStorageSync('phone', this.phone);
+								uni.setStorageSync('avatar', result.info.avatar);
+								uni.setStorageSync('name', result.info.nick);
+								this.encryption = result.encryption;
+								this.handleScanParams();
+							},
+							allError: (err) => {
+								console.log(err);
+							},
+							fail: (err) => {
 								uni.hideLoading();
 								uni.showToast({
 									title: '授权失败',
 									icon: 'none'
 								});
 							}
-						},
-						fail: (err) => {
-							uni.hideLoading();
-							uni.showToast({
-								title: '授权失败',
-								icon: 'none'
-							});
-						}
+						});
+					} else {
+						uni.hideLoading();
+						uni.showToast({
+							title: '授权失败',
+							icon: 'none'
+						});
+					}
+				},
+				fail: (err) => {
+					uni.hideLoading();
+					uni.showToast({
+						title: '授权失败',
+						icon: 'none'
 					});
 				}
 			});
 		},
+		// getPhoneNumber(e) {
+		// 	this.$request.post({
+		// 		url: 'wx/ma/user/phone',
+		// 		params: {
+		// 			code: e.target.code
+		// 		},
+		// 		success: (result) => {
+		// 			uni.login({
+		// 				provider: 'weixin',
+		// 				success: (res) => {
+		// 					console.log('login', res);
+		// 					if (res.code) {
+		// 						this.$request.post({
+		// 							url: 'wx/ma/user/public/login',
+		// 							params: {
+		// 								code: res.code,
+		// 								phone: this.phone
+		// 							},
+		// 							success: (result) => {
+		// 								console.log('result', result);
+		// 								uni.setStorageSync('login', result);
+		// 								uni.setStorageSync('token', result.token);
+		// 								uni.setStorageSync('phone', this.phone);
+		// 								uni.setStorageSync('avatar', result.info.avatar);
+		// 								uni.setStorageSync('name', result.info.nick);
+		// 								this.encryption = result.encryption;
+		// 								this.handleScanParams();
+		// 							},
+		// 							allError: (err) => {
+		// 								console.log(err);
+		// 							},
+		// 							fail: (err) => {
+		// 								uni.hideLoading();
+		// 								uni.showToast({
+		// 									title: '授权失败',
+		// 									icon: 'none'
+		// 								});
+		// 							}
+		// 						});
+		// 					} else {
+		// 						uni.hideLoading();
+		// 						uni.showToast({
+		// 							title: '授权失败',
+		// 							icon: 'none'
+		// 						});
+		// 					}
+		// 				},
+		// 				fail: (err) => {
+		// 					uni.hideLoading();
+		// 					uni.showToast({
+		// 						title: '授权失败',
+		// 						icon: 'none'
+		// 					});
+		// 				}
+		// 			});
+		// 		}
+		// 	});
+		// },
 		getUserProfile() {
 			uni.login({
 				provider: 'weixin',

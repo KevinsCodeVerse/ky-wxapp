@@ -13,9 +13,9 @@
 						</view>
 						<u-icon size="24rpx" style="margin-right: 20rpx" name="arrow-right" color="#3c3c3c"></u-icon>
 					</view>
-					<view v-else class="address-item">
+					<view @click="toAddress" v-else class="address-item">
 						<u-icon color="#3c3c3c" size="40rpx" class="icon" name="map"></u-icon>
-						<view @click="toAddress" class="add-address">+ 添加收货地址</view>
+						<view class="add-address">+ 添加收货地址</view>
 					</view>
 				</view>
 				<image class="address-line" src="@/static/index/address-line.png" mode="widthFix"></image>
@@ -244,7 +244,7 @@ export default {
 
 <style lang="scss" scoped>
 .order-page {
-	background-color: #f5f5f5;
+	background-color: #fff;
 	padding: 20rpx;
 }
 
