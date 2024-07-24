@@ -2,7 +2,8 @@
 	<view class="login">
 		<view class="content">
 			<image class="login-logo" src="@/static/index/logo.png" mode="widthFix"></image>
-			<button class="mybtn btn" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录</button>
+			<!-- <button class="mybtn btn" open-type="getPhoneNumber" @getphonenumber="getPhoneNumber">微信授权登录</button> -->
+			<button class="mybtn btn"  @click="getPhoneNumber">微信授权登录</button>
 		</view>
 	</view>
 </template>

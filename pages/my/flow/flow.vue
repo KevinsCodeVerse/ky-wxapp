@@ -1,41 +1,29 @@
 <template>
 	<view>
-	    <view class="remark">
+	    <!-- <view class="remark">
 	        <text>账单详情</text>
 	        <text>收入/支出</text>
-	    </view>
+	    </view> -->
 	    <!-- <tab class="tabss" items="{{[{name:1,text:'可用余额'},{name:2,text:'冻结余额'}]}}" active="{{1}}" bind:change="tabChange"></tab> -->
 	    <view class="telist">
 	        <view class="tecard" v-for="(item, index) in list" :key="index">
 	            <view class="toad">
 	                <view style="display: flex">
-	                    <view>{{ item.descr + '  ' }}</view>
+	                    <view>{{ item.remark + '  ' }}</view>
 	                    （
 	                    <view v-if="item.type == 1" class="add">收入</view>
 	                    <view v-if="item.type == 2" class="error">支出</view>
-	                    <view v-if="item.type == 3" class="lanse">冻结中</view>
-	                    <view v-if="item.type == 4" class="info">退款</view>
 	                    ）
 	                </view>
-	                <view class="time">{{ item.createTime }}</view>
+	                <view class="time">{{item.createTime}}</view>
 	            </view>
 	
 	            <view v-if="active == 1">
 	                <view class="price add" v-if="item.type == 1">{{ '+' }}￥{{ item.amount }}</view>
 	                <view class="price error" v-if="item.type == 2">{{ '-' }}￥{{ item.amount }}</view>
-	                <view class="price lanse" v-if="item.type == 3 && item.status == 1">{{ '+' }}￥{{ item.amount }}</view>
-	                <view class="price lanse" v-if="item.type == 3 && item.status == 2">{{ '+' }}￥{{ item.amount }}</view>
-	                <view class="price lanse" v-if="item.type == 3 && item.status == 3">{{ '-' }}￥{{ item.amount }}</view>
-	                <view class="price lanse" v-if="item.type == 3 && item.status == 5">{{ '-' }}￥{{ item.amount }}</view>
-	                <view class="price lanse" v-if="item.type == 3 && item.status == 4">{{ '+' }}￥{{ item.amount }}</view>
-	                <view class="price lanse" v-if="item.type == 3 && item.status == 9">{{ '-' }}￥{{ item.amount }}</view>
-	                <view class="price freeze" v-if="item.type == 4">￥{{ item.amount }}</view>
 	            </view>
 	        </view>
-	        <view class="loading">
-	            <van-loading v-if="loading" size="24px" color="#0DC3FF">加载中...</van-loading>
-	            <text class="finish" v-if="finish">{{ list.length > 0 ? '没有更多了' : '暂无数据' }}</text>
-	        </view>
+	        <u-loadmore :status="loadStatus" @loadmore="getList" v-if="list.length>0"></u-loadmore>
 	    </view>
 	</view>
 </template>
@@ -47,18 +35,46 @@
 				list: [
 				],
 				params:{
+					tenantId: '',
 					pageNo: 0,
 					pageSize: 20,
 				},
 				active: 1,
-				
+				loadStatus: 'loadmore',
 				
 				finish: false,
 				loading: false
 			}
 		},
+		onLoad() {
+			this.params.tenantId = uni.getStorageSync('infoId');
+			this.getList();
+		},
+		onReachBottom() {
+			this.getList();
+		},
 		methods: {
-			
+			getList() {
+				if(this.loadStatus != 'loadmore') return;
+				this.loadStatus = 'loading';
+				this.params.pageNo += 1;
+				this.$request.post({
+				  url: 'user/tenantInviteFlow/list',
+				  params: this.params,
+				  success: (result) => {
+					  if(result.length < this.params.pageSize) {
+						  this.loadStatus = 'nomore';
+					  }else {
+						  this.loadStatus = 'loadmore';
+					  }
+					  this.list = [...this.list, ...result];
+				  },
+				  catch: (e) => {
+				  },
+				  finally: (e) => {
+				  }
+				});
+			},
 		}
 	}
 </script>
