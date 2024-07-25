@@ -16,13 +16,16 @@
 						<view class="order-details">
 							<view class="order-name u-line-2">{{ JSON.parse(item.proInfo).title }}</view>
 							<view class="order-spec">{{ formatSpecName(JSON.parse(item.proInfo).specName) }}</view>
-							<view class="order-price">￥{{ item.price }}</view>
+
+							<view v-if="order.unit == 1" class="order-price">{{ item.price }}积分</view>
+							<view v-else class="order-price">￥{{ item.price }}</view>
 						</view>
 						<view class="order-count">x{{ item.count }}</view>
 					</view>
 					<view class="order-line"></view>
 					<view class="order-footer">
-						<view class="order-total">实付: ￥{{ order.payAmount }}</view>
+						<view v-if="order.unit == 1" class="order-total">实付: {{ order.payAmount }}积分</view>
+						<view v-else class="order-total">实付: ￥{{ order.payAmount }}</view>
 						<view class="order-actions">
 							<button
 								v-for="(button, index) in getButtons(order.status, order.payType)"
@@ -105,6 +108,7 @@ export default {
 							};
 						})
 					];
+
 					this.pageNo += 1;
 				}
 			});
@@ -171,7 +175,8 @@ export default {
 			} else {
 				switch (status) {
 					case 0:
-						return ['取消订单', '支付订单'];
+					// return ['取消订单', '支付订单'];
+
 					case 1:
 						return ['订单详情'];
 					case 2:

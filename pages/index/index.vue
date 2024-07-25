@@ -51,15 +51,20 @@
 				<view class="vmb-warter" v-for="(item, index) in list" :key="item.id" @click="goToDetail(item.id)">
 					<view class="vmb-img-wrap">
 						<image class="vmb-image" :src="$comm.fullPath(item.cover)" mode="aspectFill"></image>
-						<view class="img-text">会员最高省{{ item.vipPro }}元</view>
+						<view class="img-text">会员最高省{{ item.vipPro }}{{ shop.mallSet.unit == 1 ? '积分' : '元' }}</view>
 					</view>
 					<view style="padding: 0 8rpx">
 						<view class="vmb-title">{{ item.name }}</view>
-						<view class="vmb-price">
+						<view v-if="shop.mallSet.unit == 1" class="vmb-price">
+							{{ item.price }}
+							<span>积分</span>
+						</view>
+						<view v-else class="vmb-price">
 							<span>￥</span>
 							{{ item.price }}
 						</view>
-						<view class="vmb-MarketPrice">市场价￥{{ item.originalPrice }}</view>
+						<view v-if="shop.mallSet.unit == 1" class="vmb-MarketPrice">市场价{{ item.originalPrice }}积分</view>
+						<view v-else class="vmb-MarketPrice">市场价￥{{ item.originalPrice }}</view>
 					</view>
 				</view>
 			</view>
@@ -83,12 +88,12 @@ export default {
 			params: {
 				shopId: '',
 				pageNo: 1,
-				pageSize: 10 // 设定每次加载的条目数
+				pageSize: 10
 			},
 			shop: {},
 			loadStatus: 'loadmore',
 			list: [],
-			total: 0 // 总数据条目数
+			total: 0
 		};
 	},
 	onLoad() {},
@@ -181,6 +186,8 @@ export default {
 				},
 				success: (res) => {
 					this.shop = res;
+					const unit = res.mallSet.unit;
+					uni.setStorageSync('unit', unit);
 					this.shop.banner = this.shop.banner.map((item) => {
 						return {
 							...item,
@@ -192,7 +199,6 @@ export default {
 			});
 		},
 		getShopList() {
-			console.log('this.bindInfo.shopId', this.bindInfo.shopId);
 			this.$request.post({
 				url: 'user/userInfo/indexProList',
 				params: this.params,
@@ -371,6 +377,7 @@ u-swiper {
 		margin-top: 5px;
 		span {
 			font-weight: 700;
+			margin: 0 3rpx;
 			font-size: 24rpx;
 			line-height: 46rpx;
 			color: #bf8739;

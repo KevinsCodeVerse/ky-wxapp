@@ -245,13 +245,15 @@ export default {
 <style lang="scss" scoped>
 .order-page {
 	background-color: #fff;
-	padding: 20rpx;
 }
-
+.content {
+	width: 100%;
+}
 .address-box {
 	background-color: #fff;
 	border-radius: 10rpx;
 	margin: 20rpx 0;
+	padding: 0 20rpx;
 }
 .address-info {
 	background-color: #fff;

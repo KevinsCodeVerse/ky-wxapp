@@ -19,11 +19,13 @@
 						<image class="product-image" :src="$comm.fullPath(product.cover)" mode="aspectFit"></image>
 						<view class="product-info">
 							<text class="product-name">{{ product.name }}</text>
-							<view class="product-price">￥{{ product.price }}</view>
+							<view v-if="unit == 1" class="product-price">{{ product.price }}积分</view>
+							<view v-else class="product-price">￥{{ product.price }}</view>
 							<view class="flex-box">
 								<view class="">
 									<view class="product-originalPrice">￥{{ product.originalPrice }}</view>
-									<view class="right">会员价最高可省{{ product.vipPro }}元</view>
+									<view v-if="unit == 1" class="right">会员价最高可省{{ product.vipPro }}积分</view>
+									<view v-else class="right">会员价最高可省{{ product.vipPro }}元</view>
 								</view>
 							</view>
 						</view>
@@ -38,6 +40,7 @@
 export default {
 	data() {
 		return {
+			unit: null,
 			infoId: null,
 			pId: null,
 			shopId: null,
@@ -51,6 +54,9 @@ export default {
 		this.shopId = options.shopId;
 		this.getCategories(this.pId);
 		this.getProductsByCategory(this.pId);
+	},
+	onShow() {
+		this.unit = uni.getStorageSync('unit');
 	},
 	methods: {
 		getCategories(pId) {

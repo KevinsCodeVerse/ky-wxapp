@@ -6,14 +6,14 @@
 					<scroll-view class="scroll-view" scroll-y style="height: calc(100vh - 114rpx); width: 100%" @scrolltolower="reachBottom">
 						<view class="page-box" v-if="goodsList.length">
 							<view class="order">
-								<u-checkbox-group @change="checkboxGroupChange">
+								<u-checkbox-group>
 									<view v-for="(item, index) in goodsList" :key="index">
 										<u-checkbox
 											class="item-bgc"
 											shape="circle"
-											@change="goodsList.length === 0 ? showNoDataToast : checkboxChange"
+											:value="item.proName"
 											v-model="item.checked"
-											:name="item.proName"
+											@change="checkboxChange"
 											style="background-color: #fff; border-radius: 20rpx"
 										>
 											<view class="item">
@@ -24,11 +24,16 @@
 													<view class="title u-line-2">{{ item.proName }}</view>
 													<u-tag :text="formatSkuName(item.skuName)" type="info" mode="dark" />
 													<view class="price">
-														<view class="price-text">
+														<view v-if="unit == 1" class="price-text">
+															{{ priceInt(item.price) }}
+															<text class="decimal">积分</text>
+														</view>
+														<view v-else class="price-text">
 															<span>￥</span>
 															{{ priceInt(item.price) }}
 															<text class="decimal">.{{ priceDecimal(item.price) }}</text>
 														</view>
+
 														<u-number-box v-model="item.count" @change="valChange(item)"></u-number-box>
 													</view>
 												</view>
@@ -44,13 +49,16 @@
 			</swiper>
 			<view class="footer">
 				<view class="radio">
-					<u-checkbox shape="circle" v-model="isAllChecked" @change="goodsList.length === 0 ? showNoDataToast : toggleSelectAll">全选</u-checkbox>
+					<u-checkbox shape="circle" v-model="isAllChecked">全选</u-checkbox>
 				</view>
 				<view>
 					<span class="text">已选{{ totalNum }}件,</span>
 					<span class="total">合计:</span>
-					<span class="unit">￥</span>
-					<text class="decimal">{{ priceInt(totalPrice) }}.{{ priceDecimal(totalPrice) }}</text>
+
+					<span v-if="unit == 2" class="unit">￥</span>
+					<text v-if="unit == 2" class="decimal">{{ priceInt(totalPrice) }}.{{ priceDecimal(totalPrice) }}</text>
+					<text v-if="unit == 1" class="decimal">{{ priceInt(totalPrice) }}</text>
+					<span v-if="unit == 1" class="unit">积分</span>
 				</view>
 				<view class="btn-box">
 					<button :disabled="goodsList.length == 0" :class="{ 'disabled-btn': goodsList.length == 0 }" class="btn" @click="submitOrder">确定</button>
@@ -66,22 +74,13 @@ export default {
 		return {
 			isAllChecked: false,
 			goodsList: [],
-			swiperCurrent: 0
+			swiperCurrent: 0,
+			totalPrice: '0.00',
+			totalNum: 0,
+			unit: null
 		};
 	},
 	computed: {
-		totalPrice() {
-			return this.goodsList
-				.reduce((acc, item) => {
-					return item.checked ? acc + item.price * item.count : acc;
-				}, 0)
-				.toFixed(2);
-		},
-		totalNum() {
-			return this.goodsList.reduce((acc, item) => {
-				return item.checked ? acc + item.count : acc;
-			}, 0);
-		},
 		priceDecimal() {
 			return (val) => {
 				val = val.toString();
@@ -95,27 +94,44 @@ export default {
 			};
 		}
 	},
+	watch: {
+		isAllChecked(newVal) {
+			this.goodsList.forEach((item) => {
+				item.checked = newVal;
+			});
+			this.updateTotals();
+		}
+	},
 	onShow() {
+		this.unit = uni.getStorageSync('unit');
 		this.getOrderList();
 	},
 	methods: {
-		checkboxGroupChange() {
-			this.updateTotals();
-		},
 		checkboxChange() {
+			this.isAllChecked = this.goodsList.length > 0 && this.goodsList.every((item) => item.checked);
 			this.updateTotals();
 		},
 		valChange(item) {
 			this.updateTotals();
 		},
 		toggleSelectAll() {
+			this.isAllChecked = !this.isAllChecked;
 			this.goodsList.forEach((item) => {
 				item.checked = this.isAllChecked;
 			});
 			this.updateTotals();
 		},
 		updateTotals() {
-			this.isAllChecked = this.goodsList.every((item) => item.checked);
+			const totalPrice = this.goodsList
+				.reduce((acc, item) => {
+					return item.checked ? acc + item.price * item.count : acc;
+				}, 0)
+				.toFixed(2);
+			const totalNum = this.goodsList.reduce((acc, item) => {
+				return item.checked ? acc + item.count : acc;
+			}, 0);
+			this.totalPrice = totalPrice;
+			this.totalNum = totalNum;
 		},
 		formatSkuName(skuName) {
 			let parsedSku = JSON.parse(skuName);
@@ -171,16 +187,12 @@ export default {
 				icon: 'none'
 			});
 		}
-	},
-	onLoad() {
-		this.getOrderList();
 	}
 };
 </script>
-
 <style lang="scss" scoped>
 .page-box {
-	background: #f5f5f5;
+	background: #fff;
 }
 .order {
 	width: 710rpx;

@@ -1,10 +1,10 @@
 <template>
 	<view class="vmb-container">
-		<view class="vmb-my-header" :style="!vipInfo.vipName ? 'height: 200rpx' : ''">
+		<view class="vmb-my-header" :style="!vipInfo.vipStatus > 0 ? 'height: 200rpx' : ''">
 			<view class="flex">
 				<view class="u-flex">
-					<view class="u-m-r-10" @click="chooseAvatar">
-						<image class="avatar" :src="$comm.fullPath(avatar)" />
+					<view class="u-m-r-10" @click="editInfo">
+						<image class="top-avatar" :src="$comm.fullPath(avatar)" />
 					</view>
 					<view>
 						<input class="name-input" v-if="editingName" v-model="name" @blur="saveName" @keyup.enter="saveName" ref="nameInput" />
@@ -18,13 +18,11 @@
 					<view class="num">{{ vipInfo.tenantInvite.vipSavingsCard }}</view>
 				</view>
 			</view>
-			<view v-if="vipInfo.vipName" class="vip-show">
+			<view v-if="vipInfo.vipStatus > 0" class="vip-show">
 				<view class="line"></view>
 				<view class="flex">
-					<view class="">权益：商品消费打{{ vipInfo.vipDiscountRatio }}折</view>
-					<view class="">
-						<view class="">剩余{{ vipInfo.dueTime }}天</view>
-					</view>
+					<view>权益：商品消费打{{ vipInfo.vipDiscountRatio }}折</view>
+					<view>剩余{{ vipInfo.dueTime }}天</view>
 				</view>
 			</view>
 		</view>
@@ -90,6 +88,25 @@
 				</u-cell-group>
 			</view>
 		</view>
+		<u-popup v-model="showEdit" mode="bottom" custom-style="height: 40%">
+			<view class="popup-title">修改资料</view>
+			<view class="popup-content">
+				<view>
+					<u-form>
+						<button class="avatar-wrapper" @click="chooseAvatar">
+							<image class="avatar" :src="info.avatar ? util.fullPath(info.avatar) : avatarUrl"></image>
+						</button>
+						<view class="line"></view>
+						<view class="form-group">
+							<view class="label">昵称：</view>
+							<u-input style="width: 100%" border v-model="name" placeholder="请输入昵称" />
+						</view>
+
+						<u-button type="primary" block @click="getUserProfile">保存</u-button>
+					</u-form>
+				</view>
+			</view>
+		</u-popup>
 	</view>
 </template>
 
@@ -97,6 +114,8 @@
 export default {
 	data() {
 		return {
+			infoStatus: false,
+			showEdit: false,
 			show: true,
 			name: '',
 			phone: '',
@@ -108,7 +127,8 @@ export default {
 				vipName: '',
 				vipDiscountRatio: '',
 				vipSavingsCard: 0,
-				dueTime: 0
+				dueTime: 0,
+				vipStatus: 0
 			}
 		};
 	},
@@ -119,10 +139,13 @@ export default {
 		this.getOrderCount();
 	},
 	methods: {
+		editInfo() {
+			this.showEdit = true;
+		},
 		getInfo() {
-			this.name = uni.getStorageSync('name');
-			this.phone = uni.getStorageSync('phone');
-			this.avatar = uni.getStorageSync('avatar');
+			// this.name = uni.getStorageSync('name');
+			// this.phone = uni.getStorageSync('phone');
+			// this.avatar = uni.getStorageSync('avatar');
 			this.$request.post({
 				url: 'user/userInfo/getUserInfo',
 				success: (res) => {
@@ -140,7 +163,10 @@ export default {
 					infoId
 				},
 				success: (res) => {
-					console.log('res商家', res);
+					this.infoStatus = res.info.infoStatus;
+					if (res.infoStatus == false) {
+						this.showEdit = true;
+					}
 					const currentDate = new Date();
 					const dueDate = new Date(res.dueTime);
 					const timeDiff = dueDate - currentDate;
@@ -150,7 +176,7 @@ export default {
 						vipDiscountRatio: res.vipDiscountRatio,
 						vipSavingsCard: res.info.vipSavingsCard,
 						dueTime: remainingDays,
-						tenantInvite: res.tenantInvite,
+						tenantInvite: res.tenantInvite
 					};
 				}
 			});
@@ -160,7 +186,6 @@ export default {
 				url: 'user/userOrder/orderCount',
 				success: (res) => {
 					this.waitReceiveCount = res.waitReceiveCount;
-					console.log('res', res);
 				}
 			});
 		},
@@ -181,29 +206,22 @@ export default {
 				sourceType: ['album', 'camera'],
 				success: (res) => {
 					const filePath = res.tempFilePaths[0];
-
-					// 将 filePath 转换为 Base64 并上传文件
 					this.convertToBase64(filePath)
 						.then((base64) => {
 							this.uploadBase64(base64);
 						})
-						.catch((err) => {
-							console.log('err', err);
+						.catch(() => {
 							uni.showToast({
 								title: '转换文件失败',
 								icon: 'none'
 							});
 						});
-				},
-				fail: (err) => {
-					console.log('err', err);
 				}
 			});
 		},
-
 		convertToBase64(filePath) {
 			return new Promise((resolve, reject) => {
-				const fs = wx.getFileSystemManager();
+				const fs = uni.getFileSystemManager();
 				fs.readFile({
 					filePath: filePath,
 					encoding: 'base64',
@@ -216,7 +234,6 @@ export default {
 				});
 			});
 		},
-
 		uploadBase64(base64) {
 			this.$request.post({
 				url: 'wx/ma/user/editInfo',
@@ -236,13 +253,16 @@ export default {
 					});
 					this.getInfo();
 				},
-				fail: (err) => {
+				fail: () => {
 					uni.showToast({
 						title: '上传头像失败',
 						icon: 'none'
 					});
 				}
 			});
+		},
+		getUserProfile() {
+			this.saveName();
 		},
 		editName() {
 			this.editingName = true;
@@ -258,14 +278,14 @@ export default {
 				params: {
 					nick: this.name
 				},
-				success: (res) => {
+				success: () => {
 					uni.showToast({
 						title: '保存姓名成功',
 						icon: 'success'
 					});
 					this.getInfo();
 				},
-				fail: (err) => {
+				fail: () => {
 					uni.showToast({
 						title: '保存姓名失败',
 						icon: 'none'
@@ -326,6 +346,12 @@ export default {
 	text-align: center;
 	color: #333;
 }
+.top-avatar {
+	border: 4rpx solid #ffffff;
+	width: 96rpx;
+	height: 96rpx;
+	border-radius: 50%;
+}
 .avatar {
 	border: 4rpx solid #ffffff;
 	width: 96rpx;
@@ -374,8 +400,6 @@ export default {
 	}
 	&-my-nav {
 		margin: 15rpx;
-		// margin-left: auto;
-		// margin-right: auto;
 		background: #fff;
 		border-radius: 20rpx;
 		.nav {
@@ -412,7 +436,6 @@ export default {
 						border-radius: 50%;
 						background: #f56c6c;
 						font-size: 22rpx;
-
 						text-align: center;
 						color: #fff;
 					}
@@ -420,5 +443,79 @@ export default {
 			}
 		}
 	}
+}
+.popup-title {
+	font-size: 38rpx;
+	font-weight: bold;
+	text-align: center;
+	color: #333;
+	margin: 8rpx 0;
+	border-bottom: 1px solid #f1f1f1;
+}
+.popup-content {
+	padding: 20px;
+	background-color: #fff;
+	border-radius: 10px;
+}
+// .avatar-wrapper {
+// 	display: flex;
+// 	justify-content: center;
+// 	margin-bottom: 20px;
+// 	background-color: transparent;
+// 	border: none;
+// }
+.avatar-wrapper {
+	border: none !important;
+	background-color: transparent !important;
+	padding: 0 !important;
+	margin: 0 !important;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	.line {
+		background-color: #ddd;
+		height: 2rpx;
+	}
+}
+.avatar-wrapper::after {
+	content: none !important;
+}
+.avatar-wrapper::before {
+	content: none !important;
+}
+.avatar {
+	width: 140rpx;
+	height: 140rpx;
+	border-radius: 50%;
+	border: 2px solid #ddd;
+	margin-bottom: 10rpx;
+}
+.form-group {
+	display: flex;
+	align-items: center;
+	margin-bottom: 20px;
+}
+.label {
+	width: 70px;
+	font-size: 18px;
+	color: #666;
+}
+.input {
+	width: 300px;
+	flex: 1;
+	padding: 10px;
+	border: 1px solid #ddd;
+	border-radius: 5px;
+}
+.btn-foot {
+	display: flex;
+	justify-content: center;
+}
+.save {
+	background-color: #007aff;
+	color: #fff;
+	padding: 10px 20px;
+	border-radius: 5px;
+	font-size: 18px;
 }
 </style>

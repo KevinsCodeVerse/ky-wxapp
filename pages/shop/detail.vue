@@ -8,11 +8,17 @@
 
 			<!-- 商品信息 -->
 			<view class="product-info">
-				<view class="price">
+				<view v-if="unit == 1" class="price">
+					{{ pro.price }}
+					<span class="unit">积分</span>
+					<span class="old-price">市场价{{ pro.originalPrice }}积分</span>
+				</view>
+				<view v-else class="price">
 					<span class="unit">￥</span>
 					{{ pro.price }}
 					<span class="old-price">市场价￥{{ pro.originalPrice }}</span>
 				</view>
+
 				<view class="product-name">{{ pro.name }}</view>
 			</view>
 
@@ -79,7 +85,8 @@
 				<view class="popup-item">
 					<image class="popup-image" mode="aspectFit" :src="$comm.fullPath(popupData.currentSku.cover || pro.banner)"></image>
 					<view class="right">
-						<view class="popup-price">￥{{ popupData.totalPrice }}</view>
+						<view v-if="unit == 1" class="popup-price">{{ popupData.totalPrice }}积分</view>
+						<view v-else class="popup-price">￥{{ popupData.totalPrice }}</view>
 						<view class="quantity-selector">
 							<text>数量</text>
 							<u-number-box
@@ -122,6 +129,7 @@
 export default {
 	data() {
 		return {
+			unit: null,
 			customStyle: {
 				all: 'unset',
 				display: 'flex',
@@ -153,6 +161,9 @@ export default {
 	onLoad(options) {
 		const id = options.id;
 		this.getShopDetail(id);
+	},
+	onShow() {
+		this.unit = uni.getStorageSync('unit');
 	},
 	onShareAppMessage(res) {
 		let parentId = uni.getStorageSync('usId'); // 分享产品的用户Id
