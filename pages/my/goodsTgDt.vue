@@ -69,9 +69,9 @@
           <view style="display: flex; justify-content: space-between; font-size: 28rpx; margin-top: 15rpx;">
             <view>冻结中：￥{{from.freezeRoyal}}</view>
             <view style="display: flex; gap: 24rpx;">
-              <view @click="openPage('pages/my/withdrawal/withdrawal',2)">提现</view>
+              <view @click="openPage('pages/my/withdrawal/withdrawal?balance='+tenantInvite.amount,2)">提现</view>
               <view> |</view>
-              <view>转换</view>
+              <view @click="openPage('pages/my/balanceConversion/balanceConversion?balance='+tenantInvite.amount,2)">转换</view>
             </view>
           </view>
         </view>

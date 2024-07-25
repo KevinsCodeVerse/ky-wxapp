@@ -10,7 +10,7 @@
 				</u-field>
 			</view>
 			<view style="font-size: 20rpx;color: #666;">
-				目前余额￥0，最低提现金额为￥10.00
+				目前余额￥{{balance}}，最低提现金额为￥10.00
 			</view>
 		</view>
 		<view style="display: flex;flex-direction: column;align-items: center;gap: 25rpx;margin-top: 20rpx">
@@ -68,9 +68,11 @@
 					costLimit: 0,
 				},
 				load: false,
+				balance: 0,
 			}
 		},
-		onLoad() {
+		onLoad(e) {
+			this.balance = e.balance;
 			this.addFrom.tenantId = uni.getStorageSync("infoId");
 			this.getServiceBank();
 		},
@@ -105,6 +107,7 @@
 					params: this.addFrom,
 					success: (res) => {
 						this.show = false;
+						this.balance = res;
 						uni.showToast({
 							title: '提现成功,请等待审核',
 							icon: 'none',

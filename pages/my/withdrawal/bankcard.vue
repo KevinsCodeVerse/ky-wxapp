@@ -86,7 +86,6 @@
 						icon: 'none'
 					})
 					this.load = false;
-					uni.hideLoading();
 					return;
 				}
 				this.$request.post({
@@ -101,7 +100,6 @@
 					},
 					finally: (e) => {
 						this.load = false;
-						uni.hideLoading();
 					}
 				});
 			},

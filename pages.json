@@ -191,6 +191,14 @@
 				"navigationBarTitleText" : "提现记录",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/my/balanceConversion/balanceConversion",
+			"style" : 
+			{
+				"navigationBarTitleText" : "余额转换",
+				"enablePullDownRefresh" : false
+			}
 		}
 	],
 	"globalStyle": {

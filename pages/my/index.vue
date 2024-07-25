@@ -15,7 +15,7 @@
 
 				<view class="right">
 					<view class="money">账户余额</view>
-					<view class="num">{{ vipInfo.vipSavingsCard }}</view>
+					<view class="num">{{ vipInfo.tenantInvite.vipSavingsCard }}</view>
 				</view>
 			</view>
 			<view v-if="vipInfo.vipName" class="vip-show">
@@ -149,7 +149,8 @@ export default {
 						vipName: res.vipName,
 						vipDiscountRatio: res.vipDiscountRatio,
 						vipSavingsCard: res.info.vipSavingsCard,
-						dueTime: remainingDays
+						dueTime: remainingDays,
+						tenantInvite: res.tenantInvite,
 					};
 				}
 			});
