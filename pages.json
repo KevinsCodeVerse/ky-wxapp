@@ -183,6 +183,14 @@
 				"navigationBarTitleText" : "明细",
 				"enablePullDownRefresh" : false
 			}
+		},
+		{
+			"path" : "pages/my/withdrawal/list",
+			"style" : 
+			{
+				"navigationBarTitleText" : "提现记录",
+				"enablePullDownRefresh" : false
+			}
 		}
 	],
 	"globalStyle": {

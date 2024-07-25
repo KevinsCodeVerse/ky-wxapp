@@ -24,6 +24,9 @@
 			<view style="color: #FFBE00;font-size: 20rpx;" @click="openPage('pages/my/withdrawal/bankcard',2)">
 				查看/修改卡号信息
 			</view>
+			<view style="color: #FFBE00;font-size: 20rpx;" @click="openPage('pages/my/withdrawal/list',2)">
+				查看提现记录
+			</view>
 		</view>
 		
 		<u-popup v-model="show" mode="center" :closeable="true" close-icon="close-circle" custom-style="background: #3994ff00" border-radius="14">
