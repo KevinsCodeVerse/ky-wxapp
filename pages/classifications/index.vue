@@ -64,7 +64,8 @@ export default {
 			categoryStack: []
 		};
 	},
-	onLoad() {
+	onLoad() {},
+	onShow() {
 		this.getShopId();
 	},
 	methods: {
@@ -372,6 +373,7 @@ export default {
 .category-list {
 	display: flex;
 	flex-wrap: wrap;
+	justify-content: space-between;
 }
 
 .class-item {
@@ -388,13 +390,14 @@ export default {
 	font-size: 24rpx;
 	line-height: 36rpx;
 	text-align: center;
-	color: #666;
+	// color: #666;
+	color: #000;
 	font-weight: bold;
 	cursor: pointer;
 }
 .classname-img {
-	width: 114rpx;
-	height: 114rpx;
+	width: 150rpx;
+	height: 150rpx;
 }
 .flex-box {
 	display: flex;
