@@ -74,7 +74,7 @@ export default {
 	onLoad(options) {
 		if (options.type === '1') {
 			this.isSelectMode = true;
-			this.bottomButtonText = '确认';
+			// this.bottomButtonText = '添加收货地址';
 		}
 		this.getAddressList();
 	},
@@ -183,11 +183,11 @@ export default {
 			});
 		},
 		handleBottomButtonClick() {
-			if (this.isSelectMode) {
-				this.confirmSelectedAddress();
-			} else {
-				this.addAddress();
-			}
+			// if (this.isSelectMode) {
+			// 	this.confirmSelectedAddress();
+			// } else {
+			this.addAddress();
+			// }
 		},
 		handleAddressClick(address) {
 			if (this.isSelectMode) {

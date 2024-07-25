@@ -298,7 +298,7 @@ export default {
 }
 .vip {
 	margin: 10rpx 0;
-	width: 112rpx;
+	min-width: 112rpx;
 	height: 38rpx;
 	line-height: 38rpx;
 	border-radius: 19rpx;
