@@ -20,7 +20,9 @@
 						<view class="item-title">{{ item.proInfo.title }}</view>
 						<view class="item-spec">{{ formatSpecName(item.proInfo.specName) }}</view>
 						<view class="price">
-							<view class="item-price">￥{{ item.price }}</view>
+							<view v-if="unit == 1" class="item-price">{{ item.price }}积分</view>
+							<view v-else class="item-price">￥{{ item.price }}</view>
+
 							<view class="item-count">x{{ item.count }}</view>
 						</view>
 					</view>
@@ -28,7 +30,9 @@
 				<view class="line"></view>
 				<view class="pay-item">
 					<view class="cope-pay">应付</view>
-					<view class="monunt">{{ orderDetail.totalAmount }}</view>
+
+					<view v-if="unit == 1" class="monunt">{{ orderDetail.totalAmount }}积分</view>
+					<view v-else class="monunt">{{ orderDetail.totalAmount }}元</view>
 				</view>
 			</view>
 			<view class="order-summary">
@@ -67,7 +71,8 @@
 			</view>
 		</scroll-view>
 		<view class="order-footer">
-			<view>实付: ￥{{ orderDetail.payAmount }}</view>
+			<view v-if="unit == 1">实付: {{ orderDetail.payAmount }}积分</view>
+			<view v-else>实付: ￥{{ orderDetail.payAmount }}</view>
 			<view>
 				<button
 					v-for="(button, index) in getButtons(orderDetail.status, orderDetail.payType)"
@@ -89,7 +94,8 @@ export default {
 			orderDetail: {},
 			orderPays: [],
 			devList: [],
-			summaryFields: []
+			summaryFields: [],
+			unit: null
 		};
 	},
 	onLoad(options) {
@@ -106,6 +112,7 @@ export default {
 				url: 'user/userOrder/orderDetail',
 				params: { orderId },
 				success: (res) => {
+					this.unit = res.unit;
 					this.orderDetail = res.orderDetail;
 					this.devList = res.devList;
 					this.orderPays = res.orderPays.map((pay) => ({

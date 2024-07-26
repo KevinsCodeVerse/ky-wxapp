@@ -1,14 +1,13 @@
 <template>
 	<view class="vmb-container">
-		<view class="vmb-my-header" :style="!vipInfo.vipStatus > 0 ? 'height: 200rpx' : ''">
+		<view class="vmb-my-header" :style="vipInfo.vipStatus == 0 ? 'height:200rpx' : ''">
 			<view class="flex">
 				<view class="u-flex">
 					<view class="u-m-r-10" @click="editInfo">
 						<image class="top-avatar" :src="$comm.fullPath(avatar)" />
 					</view>
 					<view>
-						<input class="name-input" v-if="editingName" v-model="name" @blur="saveName" @keyup.enter="saveName" ref="nameInput" />
-						<view v-else class="name" @click="editName">{{ name }}</view>
+						<view class="name" @click="editName">{{ name }}</view>
 						<view class="vip">{{ vipInfo.vipName }}</view>
 					</view>
 				</view>
@@ -88,13 +87,14 @@
 				</u-cell-group>
 			</view>
 		</view>
-		<u-popup v-model="showEdit" mode="bottom" custom-style="height: 40%">
+		<u-popup v-model="showEdit" :mask-close-able="false" mode="bottom" custom-style="height: 40%" @close="handlePopupClose">
 			<view class="popup-title">修改资料</view>
 			<view class="popup-content">
 				<view>
 					<u-form>
+						<!-- open-type="chooseAvatar" @chooseavatar="chooseAvatar" -->
 						<button class="avatar-wrapper" @click="chooseAvatar">
-							<image class="avatar" :src="info.avatar ? util.fullPath(info.avatar) : avatarUrl"></image>
+							<image class="avatar" :src="avatar ? $comm.fullPath(avatar) : avatarUrl"></image>
 						</button>
 						<view class="line"></view>
 						<view class="form-group">
@@ -102,7 +102,7 @@
 							<u-input style="width: 100%" border v-model="name" placeholder="请输入昵称" />
 						</view>
 
-						<u-button type="primary" block @click="getUserProfile">保存</u-button>
+						<u-button type="primary" block @click="saveProfile">保存</u-button>
 					</u-form>
 				</view>
 			</view>
@@ -142,10 +142,12 @@ export default {
 		editInfo() {
 			this.showEdit = true;
 		},
+		handlePopupClose() {
+			if (this.infoStatus === 0) {
+				this.showEdit = true;
+			}
+		},
 		getInfo() {
-			// this.name = uni.getStorageSync('name');
-			// this.phone = uni.getStorageSync('phone');
-			// this.avatar = uni.getStorageSync('avatar');
 			this.$request.post({
 				url: 'user/userInfo/getUserInfo',
 				success: (res) => {
@@ -164,7 +166,7 @@ export default {
 				},
 				success: (res) => {
 					this.infoStatus = res.info.infoStatus;
-					if (res.infoStatus == false) {
+					if (res.infoStatus == 0) {
 						this.showEdit = true;
 					}
 					const currentDate = new Date();
@@ -176,7 +178,8 @@ export default {
 						vipDiscountRatio: res.vipDiscountRatio,
 						vipSavingsCard: res.info.vipSavingsCard,
 						dueTime: remainingDays,
-						tenantInvite: res.tenantInvite
+						tenantInvite: res.tenantInvite,
+						vipStatus: res.vipStatus
 					};
 				}
 			});
@@ -200,6 +203,18 @@ export default {
 			});
 		},
 		chooseAvatar() {
+			// if (e.detail.errMsg === 'chooseAvatar:ok') {
+			// 	const avatarUrl = e.detail.avatarUrl;
+			// 	this.avatar = avatarUrl;
+			// 	// 这里可以调用上传头像的函数
+			// 	this.uploadAvatar(avatarUrl);
+			// } else {
+			// 	uni.showToast({
+			// 		title: '选择头像失败',
+			// 		icon: 'none'
+			// 	});
+			// }
+
 			uni.chooseImage({
 				count: 1,
 				sizeType: ['compressed'],
@@ -208,7 +223,8 @@ export default {
 					const filePath = res.tempFilePaths[0];
 					this.convertToBase64(filePath)
 						.then((base64) => {
-							this.uploadBase64(base64);
+							console.log('base64', base64);
+							this.avatar = base64;
 						})
 						.catch(() => {
 							uni.showToast({
@@ -234,64 +250,42 @@ export default {
 				});
 			});
 		},
-		uploadBase64(base64) {
+		saveProfile() {
+			if (this.name == '') {
+				uni.showToast({
+					title: '昵称不能为空',
+					icon: 'none'
+				});
+				return;
+			}
 			this.$request.post({
 				url: 'wx/ma/user/editInfo',
 				params: {
 					nick: this.name,
-					avatar: base64
+					avatar: this.avatar
 				},
 				success: (res) => {
-					if (res.avatar) {
-						const newAvatar = res.avatar.replace(/^.*\/files/, '/files');
-						this.avatar = newAvatar;
-						uni.setStorageSync('avatar', newAvatar);
-					}
 					uni.showToast({
-						title: '上传头像成功',
+						title: '资料保存成功',
 						icon: 'success'
 					});
+					this.showEdit = false;
 					this.getInfo();
 				},
 				fail: () => {
 					uni.showToast({
-						title: '上传头像失败',
+						title: '资料保存失败',
 						icon: 'none'
 					});
 				}
 			});
-		},
-		getUserProfile() {
-			this.saveName();
 		},
 		editName() {
 			this.editingName = true;
-			this.$nextTick(() => {
-				this.$refs.nameInput.focus();
-			});
 		},
 		saveName() {
 			this.editingName = false;
-			uni.setStorageSync('name', this.name);
-			this.$request.post({
-				url: 'wx/ma/user/editInfo',
-				params: {
-					nick: this.name
-				},
-				success: () => {
-					uni.showToast({
-						title: '保存姓名成功',
-						icon: 'success'
-					});
-					this.getInfo();
-				},
-				fail: () => {
-					uni.showToast({
-						title: '保存姓名失败',
-						icon: 'none'
-					});
-				}
-			});
+			this.saveProfile();
 		}
 	}
 };
@@ -319,7 +313,7 @@ export default {
 }
 .vip {
 	margin: 10rpx 0;
-	min-width: 112rpx;
+	min-width: 132rpx;
 	height: 38rpx;
 	line-height: 38rpx;
 	border-radius: 19rpx;

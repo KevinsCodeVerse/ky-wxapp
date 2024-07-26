@@ -23,7 +23,8 @@
 							<view v-else class="product-price">￥{{ product.price }}</view>
 							<view class="flex-box">
 								<view class="">
-									<view class="product-originalPrice">￥{{ product.originalPrice }}</view>
+									<view v-if="unit == 1" class="product-originalPrice">{{ product.originalPrice }}积分</view>
+									<view v-else class="product-originalPrice">￥{{ product.originalPrice }}</view>
 									<view v-if="unit == 1" class="right">会员价最高可省{{ product.vipPro }}积分</view>
 									<view v-else class="right">会员价最高可省{{ product.vipPro }}元</view>
 								</view>
