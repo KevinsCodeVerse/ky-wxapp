@@ -42,14 +42,14 @@
 								style="display: flex;flex-direction: column;justify-content: space-between;width: -webkit-fill-available;">
 								<view style="display: flex;justify-content: space-between;">
 									<view style="font-weight: 700;font-size: 28rpx;color: #000;">
-										{{item.tenantName}}
+										{{item.goodsName}}
 									</view>
 									<view style="font-size: 28rpx;color: #aaa;">
 										{{item.type == 1?'直推':'间推'}}
 									</view>
 								</view>
 								<view style="font-size: 24rpx;color: #aaa;">
-									{{item.goodsName}}
+									{{item.createTime}}
 								</view>
 							</view>
 
@@ -79,9 +79,9 @@
 								</view>
 							</view>
 						</view>
-						<view style="font-size: 26rpx;text-align: left;color: #aaa;">
+						<!-- <view style="font-size: 26rpx;text-align: left;color: #aaa;">
 							创建时间：{{item.createTime}}
-						</view>
+						</view> -->
 					</view>
 
 
