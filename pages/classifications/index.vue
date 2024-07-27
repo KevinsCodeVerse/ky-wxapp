@@ -31,8 +31,8 @@
 									<view class="">
 										<view v-if="unit == 1" class="product-originalPrice">{{ product.originalPrice }}积分</view>
 										<view v-else class="product-originalPrice">￥{{ product.originalPrice }}</view>
-										<view v-if="unit == 1" class="right">会员价最高可省{{ product.vipPro }}积分</view>
-										<view v-else class="right">会员价最高可省{{ product.vipPro }}元</view>
+										<view v-if="unit == 1" class="right">会员价最高可省{{ product.vipSavePrice }}积分</view>
+										<view v-else class="right">会员价最高可省{{ product.vipSavePrice }}元</view>
 									</view>
 								</view>
 							</view>
@@ -159,7 +159,8 @@ export default {
 				url: 'user/userInfo/indexProListByCategory',
 				params: {
 					cId: cId,
-					shopId: this.shopId
+					shopId: this.shopId,
+					infoId: this.infoId,
 				},
 				success: (res) => {
 					if (res.length === 0) {
