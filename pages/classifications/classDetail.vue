@@ -178,7 +178,7 @@ export default {
 	display: flex;
 	justify-content: space-between;
 	.right {
-		width: 204rpx;
+		padding: 0 10rpx;
 		height: 56rpx;
 		border-radius: 8rpx;
 		background: #faf5eb;

@@ -28,7 +28,8 @@
 					<view class="product-details">
 						<view class="product-name">{{ item.pro.name }}</view>
 						<view class="product-spec" v-for="(value, key) in JSON.parse(item.sku.spec)" :key="key">{{ key }}：{{ value }}</view>
-						<view class="product-price">￥{{ item.pro.price }}</view>
+						<view v-if="unit == 1" class="product-price">{{ item.pro.price }}积分</view>
+						<view v-else class="product-price">￥{{ item.pro.price }}</view>
 					</view>
 					<view class="product-quantity">x{{ item.quantity }}</view>
 				</view>
@@ -38,7 +39,8 @@
 			<view class="fee-info">
 				<view class="fee-item">
 					<view class="fee-label">合计</view>
-					<view class="fee-value">￥{{ totalPrice }}</view>
+					<view v-if="unit == 1" class="fee-value">{{ totalPrice }}积分</view>
+					<view v-else class="fee-value">￥{{ totalPrice }}</view>
 				</view>
 			</view>
 
@@ -59,7 +61,8 @@
 		<view class="footer">
 			<view class="left">
 				<span class="total-price-label">应付:</span>
-				<span class="total-price-value">￥{{ totalPrice }}</span>
+				<span v-if="unit == 1" class="total-price-value">{{ totalPrice }}积分</span>
+				<span v-else class="total-price-value">￥{{ totalPrice }}</span>
 			</view>
 			<button :class="{ 'submit-order': true, 'submit-order-disabled': !address.name }" @click="submitOrder" :disabled="!address.name">提交订单</button>
 		</view>
@@ -70,6 +73,7 @@
 export default {
 	data() {
 		return {
+			unit: null,
 			address: {},
 			products: [],
 			carIds: [],
@@ -97,6 +101,7 @@ export default {
 		}
 	},
 	onShow() {
+		this.unit = uni.getStorageSync('unit');
 		const pages = getCurrentPages();
 		const currentPage = pages[pages.length - 1]; // 获取当前页面实例
 		if (currentPage.data.selectedAddress) {
@@ -157,6 +162,14 @@ export default {
 					success: (res) => {
 						if (this.selectedPaymentMethod == 'member' && res) {
 							this.payOrder(res);
+						} else {
+							uni.showToast({
+								title: '订单提交成功',
+								icon: 'success'
+							});
+							setTimeout(() => {
+								uni.navigateBack(1);
+							}, 1000);
 						}
 
 						// 在此处添加提交订单成功后的逻辑
