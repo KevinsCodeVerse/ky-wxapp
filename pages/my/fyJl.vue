@@ -57,9 +57,10 @@
 						<view style="display: flex;justify-content: space-around;">
 							<view>
 								<view style="font-size: 24rpx;text-align: left;color: #aaa;">
-									付款金额
+									付款{{unit==1?'积分':'金额'}}
 								</view>
-								<view style="font-size: 24rpx;text-align: left;color: #f2a600;font-weight: 700;">￥{{item.orderAmount}}
+								<view style="font-size: 24rpx;text-align: left;color: #f2a600;font-weight: 700;">
+									{{unit==1?item.orderAmount+'积分':'￥'+item.orderAmount}}
 								</view>
 							</view>
 							<view>
@@ -73,7 +74,8 @@
 								<view style="font-size: 24rpx;text-align: left;color: #aaa;">
 									预估提成
 								</view>
-								<view style="font-size: 24rpx;text-align: left;color: #f2a600;font-weight: 700;">￥{{item.secAmount}}
+								<view style="font-size: 24rpx;text-align: left;color: #f2a600;font-weight: 700;">
+									{{unit==1?item.secAmount+'积分':'￥'+item.secAmount}}
 								</view>
 							</view>
 						</view>
@@ -179,9 +181,11 @@
 				sort: "排序",
 				list:[],
 				loadStatus: 'loadmore',
+				unit:'',
 			}
 		},
 		onLoad(e){
+			this.unit = uni.getStorageSync('unit');
 			if(e.usId) {
 				this.params.id = e.usId;
 			}

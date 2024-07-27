@@ -51,7 +51,7 @@
 				<view class="vmb-warter" v-for="(item, index) in list" :key="item.id" @click="goToDetail(item.id)">
 					<view class="vmb-img-wrap">
 						<image class="vmb-image" :src="$comm.fullPath(item.cover)" mode="aspectFill"></image>
-						<view class="img-text">会员最高省{{ item.vipPro }}{{ shop.mallSet.unit == 1 ? '积分' : '元' }}</view>
+						<view class="img-text">会员最高省{{ item.vipSavePrice?item.vipSavePrice:0 }}{{ shop.mallSet.unit == 1 ? '积分' : '元' }}</view>
 					</view>
 					<view style="padding: 0 8rpx">
 						<view class="vmb-title">{{ item.name }}</view>

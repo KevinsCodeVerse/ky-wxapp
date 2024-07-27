@@ -19,8 +19,8 @@
 	            </view>
 	
 	            <view v-if="active == 1">
-	                <view class="price add" v-if="item.type == 1">{{ '+' }}￥{{ item.amount }}</view>
-	                <view class="price error" v-if="item.type == 2">{{ '-' }}￥{{ item.amount }}</view>
+	                <view class="price add" v-if="item.type == 1">{{ '+' }}{{unit==1?item.amount+'积分':'￥'+item.amount}}</view>
+	                <view class="price error" v-if="item.type == 2">{{ '-' }}{{unit==1?item.amount+'积分':'￥'+item.amount}}</view>
 	            </view>
 	        </view>
 	        <u-loadmore :status="loadStatus" @loadmore="getList" v-if="list.length>0"></u-loadmore>
@@ -44,10 +44,12 @@
 				loadStatus: 'loadmore',
 				
 				finish: false,
-				loading: false
+				loading: false,
+				unit:'',
 			}
 		},
 		onLoad() {
+			this.unit = uni.getStorageSync('unit');
 			this.params.tenantId = uni.getStorageSync('infoId');
 			this.getList();
 		},

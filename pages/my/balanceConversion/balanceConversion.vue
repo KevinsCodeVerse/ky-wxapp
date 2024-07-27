@@ -2,15 +2,15 @@
 	<view>
 		<view style="padding: 45rpx 30rpx;font-size: 30rpx;display: flex;gap: 20rpx;flex-direction: column;">
 			<view style="font-weight: 600;">
-				转换金额
+				转换{{unit==1?'积分':'金额'}}
 			</view>
 			<view>
-				<u-field v-model="addFrom.amount" placeholder="请输入金额" border-bottom label-width="50" label="￥" focus
-					:field-style="{'font-size':'50rpx','height':'55rpx'}" label-align="left">
+				<u-field v-model="addFrom.amount" :placeholder="'请输入'+unit==1?'积分':'金额'" border-bottom :label-width="unit==1?100:50" 
+				:label="unit==1?'积分':'￥'" focus :field-style="{'font-size':'50rpx','height':'55rpx'}" label-align="left">
 				</u-field>
 			</view>
 			<view style="font-size: 20rpx;color: #666;">
-				目前余额￥{{balance}}，最低转换金额为￥1.00
+				目前余额{{unit==1?balance+'积分':'￥'+balance}}，最低转换为{{unit==1?'1.00积分':'￥1.00'}}
 			</view>
 		</view>
 		<view style="display: flex;flex-direction: column;align-items: center;gap: 25rpx;margin-top: 20rpx">
@@ -36,9 +36,11 @@
 				},
 				load: false,
 				balance: 0,
+				unit:'',
 			}
 		},
 		onLoad(e) {
+			this.unit = uni.getStorageSync('unit');
 			this.balance = e.balance;
 			this.addFrom.tenantId = uni.getStorageSync("infoId");
 		},
@@ -51,7 +53,7 @@
 				})
 				if(this.addFrom.amount < 1) {
 					uni.showToast({
-						title: '最低转换1元!',
+						title: '最低转换1!',
 						icon: 'none'
 					})
 					this.load = false;

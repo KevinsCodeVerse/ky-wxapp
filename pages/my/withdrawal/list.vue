@@ -14,7 +14,7 @@
 					<view class="time" style="color: #f55656; width: 690rpx;" v-if="item.refusedReason">失败原因：{{item.refusedReason}}</view>
 	            </view>
 	            <view style="align-items: center;display: flex;flex-direction: column;">
-	                <view class="price add">￥{{ item.money }}</view>
+	                <view class="price add">{{unit==1?item.money+'积分':'￥'+item.money}}</view>
 	            	<view class="price error" v-if="item.status == 0">审核中</view>
 	            	<view class="price error" v-if="item.status == 1">提现成功</view>
 	            	<view class="price error" v-if="item.status == -1">提现失败</view>
@@ -40,10 +40,12 @@
 				loadStatus: 'loadmore',
 				
 				finish: false,
-				loading: false
+				loading: false,
+				unit:'',
 			}
 		},
 		onLoad() {
+			this.unit = uni.getStorageSync('unit');
 			this.params.tenantId = uni.getStorageSync('infoId');
 			this.getList();
 		},

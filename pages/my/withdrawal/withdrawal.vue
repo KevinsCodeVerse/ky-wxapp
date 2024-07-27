@@ -2,15 +2,15 @@
 	<view>
 		<view style="padding: 45rpx 30rpx;font-size: 30rpx;display: flex;gap: 20rpx;flex-direction: column;">
 			<view style="font-weight: 600;">
-				提现金额
+				提现{{unit==1?'积分':'金额'}}
 			</view>
 			<view>
-				<u-field v-model="addFrom.money" placeholder="请输入金额" border-bottom label-width="50" label="￥" focus
-					:field-style="{'font-size':'50rpx','height':'55rpx'}" label-align="left">
+				<u-field v-model="addFrom.money" :placeholder="'请输入'+unit==1?'积分':'金额'" border-bottom :label-width="unit==1?100:50" 
+				 :label="unit==1?'积分':'￥'" focus :field-style="{'font-size':'50rpx','height':'55rpx'}" label-align="left">
 				</u-field>
 			</view>
 			<view style="font-size: 20rpx;color: #666;">
-				目前余额￥{{balance}}，最低提现金额为￥10.00
+				目前余额{{unit==1?balance+'积分':'￥'+balance}}，最低提现为{{unit==1?'10.00积分':'￥10.00'}}
 			</view>
 		</view>
 		<view style="display: flex;flex-direction: column;align-items: center;gap: 25rpx;margin-top: 20rpx">
@@ -34,16 +34,16 @@
 		        <view class="title">确认提现</view>
 		        <view class="bor_bt">
 		            <view class="fs24">提现</view>
-		            <view class="price">￥{{ addFrom.money }}</view>
+		            <view class="price">{{unit==1?addFrom.money+'积分':'￥'+addFrom.money}} </view>
 		            <view class="flex_text">
 		                <view>服务费</view>
-		                <view>￥{{servicePrice}}</view>
+		                <view>{{unit==1?servicePrice+'积分':'￥'+servicePrice}}</view>
 		            </view>
 		            <view class="flex_text" v-if="service.costProportion !== '0'">
 		                <view>费率</view>
 		                <view>
 		                    <text>{{ service.costProportion }}%</text>
-		                    <text>(最低￥{{ service.costLimit }})</text>
+		                    <text>(最低{{unit==1?service.costLimit+'积分':'￥'+service.costLimit}})</text>
 		                </view>
 		            </view>
 		            <view class="btns" hover-class="btns_active" @click="toWithdraw">确认提现</view>
@@ -69,9 +69,11 @@
 				},
 				load: false,
 				balance: 0,
+				unit:'',
 			}
 		},
 		onLoad(e) {
+			this.unit = uni.getStorageSync('unit');
 			this.balance = e.balance;
 			this.addFrom.tenantId = uni.getStorageSync("infoId");
 			this.getServiceBank();
@@ -95,7 +97,7 @@
 				})
 				if(this.addFrom.money < 10) {
 					uni.showToast({
-						title: '最低提现10元!',
+						title: '最低提现10!',
 						icon: 'none'
 					})
 					this.load = false;
@@ -141,7 +143,7 @@
 				}
 				if (this.addFrom.money < 10) {
 				    uni.showToast({
-				        title: '最低提现10元!',
+				        title: '最低提现10!',
 				        icon: 'none'
 				    });
 				    return;

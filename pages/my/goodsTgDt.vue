@@ -67,7 +67,7 @@
             <view>{{tenantInvite.amount}}</view>
           </view>
           <view style="display: flex; justify-content: space-between; font-size: 28rpx; margin-top: 15rpx;">
-            <view>冻结中：￥{{from.freezeRoyal}}</view>
+            <view>冻结中：{{unit==1?from.freezeRoyal+'积分':'￥'+from.freezeRoyal}}</view>
             <view style="display: flex; gap: 24rpx;">
               <view @click="openPage('pages/my/withdrawal/withdrawal?balance='+tenantInvite.amount,2)">提现</view>
               <view> |</view>
@@ -81,7 +81,7 @@
       <view
           style="width: 686rpx;height: 88rpx;border-radius: 24rpx 24rpx 0 0;background: linear-gradient(90.00deg, #fff2d6 0%, #fff 100%);padding: 28rpx 20rpx;">
         <view style="display: flex;align-items: center;gap: 12rpx">
-          <u-image width="32rpx" height="32rpx" src="/static/my/shouyi.png"></u-image>
+          <u-image width="32rpx" height="32rpx" src="/static/my/shouyi.png" v-if="unit == 2"></u-image>
           <view style="font-weight: 700;font-size: 32rpx;color: #333;">我的收益</view>
         </view>
       </view>
@@ -142,28 +142,28 @@
               <u-image width="128rpx" height="40rpx" src="/static/my/vip1.png"></u-image>
               <view style="font-size: 24rpx;line-height: 36rpx;text-align: left;color: #999;margin-top: 5rpx;">
                 条件:无需业绩条件<br/>
-                每直接推荐用户下单奖励{{ Math.floor(from.ptZ * 10000) / 100 }}%元，间接推荐下单奖励{{ Math.floor(from.ptJ * 10000) / 100 }}%元
+                每直接推荐用户下单奖励{{ Math.floor(from.ptZ * 10000) / 100 }}%{{unit==1?'积分':'元'}}，间接推荐下单奖励{{ Math.floor(from.ptJ * 10000) / 100 }}%{{unit==1?'积分':'元'}}
               </view>
             </view>
             <view style="display: flex;justify-content: flex-start;flex-direction: column;margin-bottom: 20rpx;">
               <u-image width="128rpx" height="40rpx" src="/static/my/vip2.png"></u-image>
               <view style="font-size: 24rpx;line-height: 36rpx;text-align: left;color: #999;margin-top: 5rpx;">
                 条件:需累计{{ from.hjTj }}直推业绩和{{ from.hjTeamTj }}间推业绩<br/>
-                每直接推荐用户下单奖励{{ Math.floor(from.hjZ * 10000) / 100 }}%元，间接推荐下单奖励{{ Math.floor(from.hjJ * 10000) / 100 }}%元
+                每直接推荐用户下单奖励{{ Math.floor(from.hjZ * 10000) / 100 }}%{{unit==1?'积分':'元'}}，间接推荐下单奖励{{ Math.floor(from.hjJ * 10000) / 100 }}%{{unit==1?'积分':'元'}}
               </view>
             </view>
             <view style="display: flex;justify-content: flex-start;flex-direction: column;margin-bottom: 20rpx;">
               <u-image width="108rpx" height="40rpx" src="/static/my/vip3.png"></u-image>
               <view style="font-size: 24rpx;line-height: 36rpx;text-align: left;color: #999;margin-top: 5rpx;">
                 条件:需累计{{ from.hhrTj }}直推业绩和{{ from.hhrTeamTj }}间推业绩<br/>
-                每直接推荐用户下单奖励{{ Math.floor(from.hhrZ * 10000) / 100 }}%元，间接推荐下单奖励{{ Math.floor(from.hhrJ * 10000) / 100 }}%元
+                每直接推荐用户下单奖励{{ Math.floor(from.hhrZ * 10000) / 100 }}%{{unit==1?'积分':'元'}}，间接推荐下单奖励{{ Math.floor(from.hhrJ * 10000) / 100 }}%{{unit==1?'积分':'元'}}
               </view>
             </view>
             <view style="display: flex;justify-content: flex-start;flex-direction: column;margin-bottom: 20rpx;">
               <u-image width="148rpx" height="40rpx" src="/static/my/vip4.png"></u-image>
               <view style="font-size: 24rpx;line-height: 36rpx;text-align: left;color: #999;margin-top: 5rpx;">
                 条件:需累计{{ from.zzHhrTj }}直推业绩和{{ from.zzHhrTeamTj }}间推业绩<br/>
-                每直接推荐用户下单奖励{{ Math.floor(from.zzHhrZ * 10000) / 100 }}%元，间接推荐下单奖励{{ Math.floor(from.zzHhrJ * 10000) / 100 }}%元
+                每直接推荐用户下单奖励{{ Math.floor(from.zzHhrZ * 10000) / 100 }}%{{unit==1?'积分':'元'}}，间接推荐下单奖励{{ Math.floor(from.zzHhrJ * 10000) / 100 }}%{{unit==1?'积分':'元'}}
               </view>
             </view>
 
@@ -250,10 +250,12 @@ export default {
 	  shareImgList:[],
 	  tenantInvite:{
 		  amount: 0,
-	  }
+	  },
+	  unit:'',
     };
   },
   onLoad() {
+	  this.unit = uni.getStorageSync('unit');
     this.tgInfo();
 	this.getShareImgList();
   },
