@@ -168,7 +168,7 @@ export default {
 								icon: 'success'
 							});
 							setTimeout(() => {
-								uni.navigateBack(1);
+								uni.navigateBack();
 							}, 1000);
 						}
 
@@ -200,7 +200,7 @@ export default {
 								icon: 'success'
 							});
 							setTimeout(() => {
-								uni.navigateBack(1);
+								uni.navigateBack();
 							}, 1000);
 						}
 
@@ -227,7 +227,7 @@ export default {
 						icon: 'success'
 					});
 					setTimeout(() => {
-						uni.navigateBack(1);
+						uni.navigateBack();
 					}, 1000); // 显示提示信息2秒后再后退
 				},
 				fail: (err) => {

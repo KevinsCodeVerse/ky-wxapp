@@ -115,7 +115,7 @@ export default {
 					this.unit = res.unit;
 					this.orderDetail = res.orderDetail;
 					this.devList = res.devList;
-					this.orderPays = res.orderPays.map((pay) => ({
+					this.this.orderPays = res.orderPays.map((pay) => ({
 						...pay,
 						proInfo: JSON.parse(pay.proInfo)
 					}));
@@ -127,7 +127,8 @@ export default {
 			this.summaryFields = [
 				{ label: '订单生成时间', value: this.orderDetail.createTime },
 				{ label: '支付时间', value: this.orderDetail.payTime || '-' },
-				{ label: '交易完成时间', value: this.orderDetail.receivingTime || '-' }
+				{ label: '交易完成时间', value: this.orderDetail.receivingTime || '-' },
+				{ label: '支付方式', value: this.orderDetail.receivingTime || '-' }
 			];
 		},
 		getStatusText(status) {

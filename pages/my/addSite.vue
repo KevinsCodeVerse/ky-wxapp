@@ -148,11 +148,11 @@ export default {
 							title: '新增成功',
 							icon: 'success'
 						});
-						if (this.type == 1) {
-							setTimeout(() => {
-								uni.navigateBack();
-							}, 1000);
-						}
+						// if (this.type == 1) {
+
+						uni.navigateBack();
+
+						// }
 
 						this.restForm();
 					},
