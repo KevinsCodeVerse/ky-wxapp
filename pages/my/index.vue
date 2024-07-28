@@ -87,7 +87,7 @@
 				</u-cell-group>
 			</view>
 		</view>
-		<u-popup v-model="showEdit" :mask-close-able="false" mode="center" @close="handlePopupClose" border-radius="30">
+		<u-popup v-model="showEdit" :mask-close-able="infoStatus == 0 ? false : true" mode="center" @close="handlePopupClose" border-radius="30">
 			<view class="popup-title">修改资料</view>
 			<view class="popup-content">
 				<view>
@@ -100,7 +100,7 @@
 						<view class="line"></view>
 						<view class="form-group">
 							<view class="label">昵称：</view>
-							<u-input :border="false" v-model="name" placeholder="请输入昵称" />
+							<input @change="changeInput" type="nickname" v-model="name" placeholder="请输入昵称" />
 						</view>
 
 						<u-button shape="circle" type="primary" block @click="saveProfile">保存</u-button>
@@ -140,6 +140,9 @@ export default {
 		this.getOrderCount();
 	},
 	methods: {
+		changeInput(e) {
+			this.name = e.detail.value;
+		},
 		editInfo() {
 			this.showEdit = true;
 		},
@@ -167,7 +170,11 @@ export default {
 				},
 				success: (res) => {
 					this.infoStatus = res.info.infoStatus;
-					if (res.infoStatus == 0) {
+					if (this.infoStatus == 0) {
+						uni.showToast({
+							title: '请先设置头像和昵称',
+							icon: 'none'
+						});
 						this.showEdit = true;
 					}
 					const currentDate = new Date();
@@ -262,7 +269,9 @@ export default {
 						icon: 'success'
 					});
 					this.showEdit = false;
+					this.infoStatus = 1;
 					this.getInfo();
+					this.getShopInfo();
 				},
 				fail: () => {
 					uni.showToast({
