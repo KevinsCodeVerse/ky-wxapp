@@ -87,19 +87,20 @@
 				</u-cell-group>
 			</view>
 		</view>
-		<u-popup v-model="showEdit" :mask-close-able="false" mode="center" custom-style="height: 40%;width:550rpx" @close="handlePopupClose" border-radius="30">
+		<u-popup v-model="showEdit" :mask-close-able="false" mode="center" @close="handlePopupClose" border-radius="30">
 			<view class="popup-title">修改资料</view>
 			<view class="popup-content">
 				<view>
 					<u-form>
+						<!-- @click="chooseAvatar" -->
 						<!-- open-type="chooseAvatar" @chooseavatar="chooseAvatar" -->
-						<button class="avatar-wrapper" @click="chooseAvatar">
+						<button class="avatar-wrapper" open-type="chooseAvatar" @chooseavatar="chooseAvatar">
 							<image class="avatar" :src="avatar ? $comm.fullPath(avatar) : avatarUrl"></image>
 						</button>
 						<view class="line"></view>
 						<view class="form-group">
 							<view class="label">昵称：</view>
-							<u-input style="width: 100%" v-model="name" placeholder="请输入昵称" />
+							<u-input :border="false" v-model="name" placeholder="请输入昵称" />
 						</view>
 
 						<u-button shape="circle" type="primary" block @click="saveProfile">保存</u-button>
@@ -202,38 +203,29 @@ export default {
 				url: path
 			});
 		},
-		chooseAvatar() {
-			// if (e.detail.errMsg === 'chooseAvatar:ok') {
-			// 	const avatarUrl = e.detail.avatarUrl;
-			// 	this.avatar = avatarUrl;
-			// 	// 这里可以调用上传头像的函数
-			// 	this.uploadAvatar(avatarUrl);
-			// } else {
-			// 	uni.showToast({
-			// 		title: '选择头像失败',
-			// 		icon: 'none'
-			// 	});
-			// }
+		chooseAvatar(e) {
+			console.log('e', e);
+			this.avatar = e.detail.avatarUrl;
 
-			uni.chooseImage({
-				count: 1,
-				sizeType: ['compressed'],
-				sourceType: ['album', 'camera'],
-				success: (res) => {
-					const filePath = res.tempFilePaths[0];
-					this.convertToBase64(filePath)
-						.then((base64) => {
-							console.log('base64', base64);
-							this.avatar = base64;
-						})
-						.catch(() => {
-							uni.showToast({
-								title: '转换文件失败',
-								icon: 'none'
-							});
-						});
-				}
-			});
+			// uni.chooseImage({
+			// 	count: 1,
+			// 	sizeType: ['compressed'],
+			// 	sourceType: ['album', 'camera'],
+			// 	success: (res) => {
+			// 		const filePath = res.tempFilePaths[0];
+			// 		this.convertToBase64(filePath)
+			// 			.then((base64) => {
+			// 				console.log('base64', base64);
+			// 				this.avatar = base64;
+			// 			})
+			// 			.catch(() => {
+			// 				uni.showToast({
+			// 					title: '转换文件失败',
+			// 					icon: 'none'
+			// 				});
+			// 			});
+			// 	}
+			// });
 		},
 		convertToBase64(filePath) {
 			return new Promise((resolve, reject) => {
@@ -447,7 +439,7 @@ export default {
 }
 .popup-content {
 	overflow: hidden;
-	padding: 40rpx 55rpx;
+	padding: 40rpx 15rpx;
 	background-color: #fff;
 	border-radius: 20rpx;
 }
@@ -485,20 +477,20 @@ export default {
 	margin-bottom: 10rpx;
 }
 .form-group {
+	width: 500rpx;
 	display: flex;
 	align-items: center;
 	margin-bottom: 20px;
-	border: 2rpx solid #f1f1f1;
+	border-top: 2rpx solid #f1f1f1;
+	border-bottom: 2rpx solid #f1f1f1;
 }
 .label {
-	width: 70px;
+	// width: 70px;
 	font-size: 30rpx;
 	color: #666;
 }
 .input {
-	width: 300px;
 	flex: 1;
-	padding: 10px;
 	border: 1px solid #ddd;
 	border-radius: 5px;
 }
