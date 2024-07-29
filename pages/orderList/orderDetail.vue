@@ -49,25 +49,57 @@
 					<text>{{ field.label }}</text>
 					<text class="field-value">{{ field.value }}</text>
 				</view>
-				<text class="title">快递信息</text>
-				<view v-for="item in devList" :key="item.id" class="">
-					<view class="summary-item">
-						<text>发货时间</text>
-						<text class="field-value">{{ item.createTime }}</text>
+				<block v-if="devList.length > 0">
+					<text class="title">快递信息</text>
+					<view v-for="item in devList" :key="item.id" class="">
+						<view class="summary-item">
+							<text>发货时间</text>
+							<text class="field-value">{{ item.createTime }}</text>
+						</view>
+						<view class="summary-item">
+							<text>{{ item.logisticsCompany }}</text>
+							<text class="field-value">
+								{{ item.logisticsNumber }}
+								<text style="margin: 0 10rpx">|</text>
+								<text class="copy-icon" @click="copylogisticsNumber(item.logisticsNumber)">复制</text>
+							</text>
+						</view>
+						<scroll-view class="order-item-imgbox" scroll-x>
+							<image v-for="(img, index) in orderPays" :key="index" class="order-item-image" :src="$comm.fullPath(img.proInfo.avatar)"></image>
+						</scroll-view>
+						<view class="count">共{{ item.count }}件商品</view>
 					</view>
-					<view class="summary-item">
-						<text>{{ item.logisticsCompany }}</text>
-						<text class="field-value">
-							{{ item.logisticsNumber }}
-							<text style="margin: 0 10rpx">|</text>
-							<text class="copy-icon" @click="copylogisticsNumber(item.logisticsNumber)">复制</text>
-						</text>
+				</block>
+
+				<!-- 现金付款记录 -->
+				<block v-if="bills.length > 0">
+					<view class="title">现金付款记录</view>
+					<view v-for="item in bills" :key="item.id" class="">
+						<view class="summary-item">
+							<text>收款人</text>
+							<text class="field-value">{{ item.auditAd }}</text>
+						</view>
+						<view class="summary-item">
+							<text>收款</text>
+							<text v-if="unit == 1" class="field-value">{{ item.amount }}积分</text>
+							<text v-else class="field-value">￥{{ item.amount }}</text>
+						</view>
+						<view class="summary-item">
+							<text>备注</text>
+							<text class="field-value">{{ item.remark }}</text>
+						</view>
+						<view class="summary-item">
+							<text>登记时间</text>
+							<text class="field-value">{{ item.auditTime }}</text>
+						</view>
+						<view class="summary-item">
+							<text>付款情况</text>
+							<text class="field-value">实付金额：{{ item.amount }}，已付{{ item.amount }}，未付{{ item.amount }}</text>
+						</view>
+						<view class="line"></view>
+						<!-- <view class="count">共{{ item.count }}件商品</view> -->
 					</view>
-					<scroll-view class="order-item-imgbox" scroll-x>
-						<image v-for="(img, index) in orderPays" :key="index" class="order-item-image" :src="$comm.fullPath(img.proInfo.avatar)"></image>
-					</scroll-view>
-					<view class="count">共{{ item.count }}件商品</view>
-				</view>
+				</block>
 			</view>
 		</scroll-view>
 		<view class="order-footer">
@@ -94,6 +126,7 @@ export default {
 			orderDetail: {},
 			orderPays: [],
 			devList: [],
+			bills: [],
 			summaryFields: [],
 			unit: null
 		};
@@ -115,6 +148,7 @@ export default {
 					this.unit = res.unit;
 					this.orderDetail = res.orderDetail;
 					this.devList = res.devList;
+					this.bills = res.bills;
 					this.orderPays = res.orderPays.map((pay) => ({
 						...pay,
 						proInfo: JSON.parse(pay.proInfo)
@@ -127,8 +161,8 @@ export default {
 			this.summaryFields = [
 				{ label: '订单生成时间', value: this.orderDetail.createTime },
 				{ label: '支付时间', value: this.orderDetail.payTime || '-' },
-				{ label: '交易完成时间', value: this.orderDetail.receivingTime || '-' },
-				{ label: '支付方式', value: this.orderDetail.receivingTime || '-' }
+				{ label: '交易完成时间', value: this.orderDetail?.receivingTime || '-' },
+				{ label: '支付方式', value: this.orderDetail?.receivingTime || '-' }
 			];
 		},
 		getStatusText(status) {

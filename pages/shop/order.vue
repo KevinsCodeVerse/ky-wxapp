@@ -169,15 +169,9 @@ export default {
 							});
 							setTimeout(() => {
 								// uni.navigateBack();
-<<<<<<< HEAD
-								uni.navigateTo({
-									url: `/pages/orderList/orderDetail?orderId=${res}`
-								});
-=======
 								uni.redirectTo({
-								  url: '/pages/orderList/orderDetail?orderId='+res
-								})
->>>>>>> bffa5c688f96c25cc81b54027763751e4ebc5b74
+									url: '/pages/orderList/orderDetail?orderId=' + res
+								});
 							}, 1000);
 						}
 
@@ -210,15 +204,9 @@ export default {
 							});
 							setTimeout(() => {
 								// uni.navigateBack();
-<<<<<<< HEAD
-								uni.navigateTo({
-									url: `/pages/orderList/orderDetail?orderId=${res}`
-								});
-=======
 								uni.redirectTo({
-								  url: '/pages/orderList/orderDetail?orderId='+res
-								})
->>>>>>> bffa5c688f96c25cc81b54027763751e4ebc5b74
+									url: '/pages/orderList/orderDetail?orderId=' + res
+								});
 							}, 1000);
 						}
 
@@ -245,16 +233,9 @@ export default {
 						icon: 'success'
 					});
 					setTimeout(() => {
-<<<<<<< HEAD
-						// uni.navigateBack();
-						uni.navigateTo({
-							url: `/pages/orderList/orderDetail?orderId=${res}`
-						});
-=======
 						uni.redirectTo({
-						  url: '/pages/orderList/orderDetail?orderId='+orderId
-						})
->>>>>>> bffa5c688f96c25cc81b54027763751e4ebc5b74
+							url: '/pages/orderList/orderDetail?orderId=' + orderId
+						});
 					}, 1000); // 显示提示信息2秒后再后退
 				},
 				fail: (err) => {
@@ -263,12 +244,12 @@ export default {
 						icon: 'none'
 					});
 				},
-				error:(res) => {
-					if(res.data.result.indexOf('余额不足') != -1) {
+				error: (res) => {
+					if (res.data.result.indexOf('余额不足') != -1) {
 						setTimeout(() => {
 							uni.redirectTo({
-							  url: '/pages/orderList/orderDetail?orderId='+orderId
-							})
+								url: '/pages/orderList/orderDetail?orderId=' + orderId
+							});
 						}, 1000);
 					}
 				}
