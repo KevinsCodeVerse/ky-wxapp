@@ -382,6 +382,7 @@ export default {
 	color: #666;
 	margin-bottom: 10rpx;
 }
+
 .order-price {
 	font-weight: 900;
 	font-size: 32rpx;

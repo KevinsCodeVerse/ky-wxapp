@@ -257,28 +257,30 @@ export default {
 				});
 				return;
 			}
-			this.$request.post({
-				url: 'wx/ma/user/editInfo',
-				params: {
-					nick: this.name,
-					avatar: this.avatar
-				},
-				success: (res) => {
-					uni.showToast({
-						title: '资料保存成功',
-						icon: 'success'
-					});
-					this.showEdit = false;
-					this.infoStatus = 1;
-					this.getInfo();
-					this.getShopInfo();
-				},
-				fail: () => {
-					uni.showToast({
-						title: '资料保存失败',
-						icon: 'none'
-					});
-				}
+			this.convertToBase64(this.avatar).then((avatarRes) => {
+				this.$request.post({
+					url: 'wx/ma/user/editInfo',
+					params: {
+						nick: this.name,
+						avatar: avatarRes
+					},
+					success: (res) => {
+						uni.showToast({
+							title: '资料保存成功',
+							icon: 'success'
+						});
+						this.showEdit = false;
+						this.infoStatus = 1;
+						this.getInfo();
+						this.getShopInfo();
+					},
+					fail: () => {
+						uni.showToast({
+							title: '资料保存失败',
+							icon: 'none'
+						});
+					}
+				});
 			});
 		},
 		editName() {
