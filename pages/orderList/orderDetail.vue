@@ -115,7 +115,7 @@ export default {
 					this.unit = res.unit;
 					this.orderDetail = res.orderDetail;
 					this.devList = res.devList;
-					this.this.orderPays = res.orderPays.map((pay) => ({
+					this.orderPays = res.orderPays.map((pay) => ({
 						...pay,
 						proInfo: JSON.parse(pay.proInfo)
 					}));
