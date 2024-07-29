@@ -168,7 +168,10 @@ export default {
 								icon: 'success'
 							});
 							setTimeout(() => {
-								uni.navigateBack();
+								// uni.navigateBack();
+								uni.redirectTo({
+								  url: '/pages/orderList/orderDetail?orderId='+res
+								})
 							}, 1000);
 						}
 
@@ -200,7 +203,10 @@ export default {
 								icon: 'success'
 							});
 							setTimeout(() => {
-								uni.navigateBack();
+								// uni.navigateBack();
+								uni.redirectTo({
+								  url: '/pages/orderList/orderDetail?orderId='+res
+								})
 							}, 1000);
 						}
 
@@ -227,7 +233,9 @@ export default {
 						icon: 'success'
 					});
 					setTimeout(() => {
-						uni.navigateBack();
+						uni.redirectTo({
+						  url: '/pages/orderList/orderDetail?orderId='+orderId
+						})
 					}, 1000); // 显示提示信息2秒后再后退
 				},
 				fail: (err) => {
@@ -235,6 +243,15 @@ export default {
 						title: '订单提交失败',
 						icon: 'none'
 					});
+				},
+				error:(res) => {
+					if(res.data.result.indexOf('余额不足') != -1) {
+						setTimeout(() => {
+							uni.redirectTo({
+							  url: '/pages/orderList/orderDetail?orderId='+orderId
+							})
+						}, 1000);
+					}
 				}
 			});
 		},
