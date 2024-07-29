@@ -168,7 +168,10 @@ export default {
 								icon: 'success'
 							});
 							setTimeout(() => {
-								uni.navigateBack();
+								// uni.navigateBack();
+								uni.navigateTo({
+									url: `/pages/orderList/orderDetail?orderId=${res}`
+								});
 							}, 1000);
 						}
 
@@ -200,7 +203,10 @@ export default {
 								icon: 'success'
 							});
 							setTimeout(() => {
-								uni.navigateBack();
+								// uni.navigateBack();
+								uni.navigateTo({
+									url: `/pages/orderList/orderDetail?orderId=${res}`
+								});
 							}, 1000);
 						}
 
@@ -227,7 +233,10 @@ export default {
 						icon: 'success'
 					});
 					setTimeout(() => {
-						uni.navigateBack();
+						// uni.navigateBack();
+						uni.navigateTo({
+							url: `/pages/orderList/orderDetail?orderId=${res}`
+						});
 					}, 1000); // 显示提示信息2秒后再后退
 				},
 				fail: (err) => {
