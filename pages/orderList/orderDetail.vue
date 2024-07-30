@@ -77,7 +77,7 @@
 					<view v-for="item in bills" :key="item.id" class="">
 						<view class="summary-item">
 							<text>收款人</text>
-							<text class="field-value">{{ item.auditAd }}</text>
+							<text class="field-value">{{ item.registerAd }}</text>
 						</view>
 						<view class="summary-item">
 							<text>收款</text>
@@ -90,14 +90,14 @@
 						</view>
 						<view class="summary-item">
 							<text>登记时间</text>
-							<text class="field-value">{{ item.auditTime }}</text>
+							<text class="field-value">{{ item.createTime }}</text>
 						</view>
-						<view class="summary-item">
-							<text>付款情况</text>
-							<text class="field-value">实付金额：{{ item.amount }}，已付{{ item.amount }}，未付{{ item.amount }}</text>
-						</view>
+
 						<view class="line"></view>
-						<!-- <view class="count">共{{ item.count }}件商品</view> -->
+					</view>
+					<view class="summary-item">
+						<text>付款情况</text>
+						<text class="field-value">实付金额：{{ orderDetail.totalAmount }}，已付{{ paidAmount }}，未付{{ unpaidAmount }}</text>
 					</view>
 				</block>
 			</view>
@@ -128,7 +128,9 @@ export default {
 			devList: [],
 			bills: [],
 			summaryFields: [],
-			unit: null
+			unit: null,
+			paidAmount: 0,
+			unpaidAmount: 0
 		};
 	},
 	onLoad(options) {
@@ -154,6 +156,7 @@ export default {
 						proInfo: JSON.parse(pay.proInfo)
 					}));
 					this.setupSummaryFields();
+					this.calculateAmounts();
 				}
 			});
 		},
@@ -164,6 +167,12 @@ export default {
 				{ label: '交易完成时间', value: this.orderDetail?.receivingTime || '-' },
 				{ label: '支付方式', value: this.orderDetail?.receivingTime || '-' }
 			];
+		},
+		calculateAmounts() {
+			let paidAmount = this.bills.reduce((sum, bill) => sum + bill.amount, 0);
+			let unpaidAmount = this.orderDetail.payAmount - paidAmount;
+			this.paidAmount = paidAmount;
+			this.unpaidAmount = unpaidAmount;
 		},
 		getStatusText(status) {
 			switch (status) {
@@ -221,18 +230,9 @@ export default {
 		},
 		getButtons(status, payType) {
 			if (payType === 2) {
-				// 如果是线下订单，不显示“支付订单”按钮
 				switch (status) {
-					case 0:
-					// return [{ text: '取消订单', action: 'cancel', class: 'default-button' }];
-					case 1:
-					// return [{ text: '取消订单', action: 'cancel', class: 'default-button' }];
 					case 2:
 						return [{ text: '确认收货', action: 'confirmReceipt', class: 'primary-button' }];
-					case 3:
-					// return [{ text: '申请售后', action: 'applyAfterSale', class: 'default-button' }];
-					case 4:
-					// return [{ text: '申请退货', action: 'applyReturn', class: 'default-button' }];
 					case -1:
 						return [{ text: '再来一单', action: 'reorder', class: 'default-button' }];
 					default:
@@ -241,18 +241,9 @@ export default {
 			} else {
 				switch (status) {
 					case 0:
-						return [
-							// { text: '取消订单', action: 'cancel', class: 'default-button' },
-							{ text: '去支付', action: 'pay', class: 'primary-button' }
-						];
-					case 1:
-						// 	return [{ text: '取消订单', action: 'cancel', class: 'default-button' }];
-						// case 2:
+						return [{ text: '去支付', action: 'pay', class: 'primary-button' }];
+					case 2:
 						return [{ text: '确认收货', action: 'confirmReceipt', class: 'primary-button' }];
-					case 3:
-					// return [{ text: '申请售后', action: 'applyAfterSale', class: 'default-button' }];
-					// case 4:
-					// 	return [{ text: '申请退货', action: 'applyReturn', class: 'default-button' }];
 					case -1:
 						return [{ text: '再来一单', action: 'reorder', class: 'default-button' }];
 					default:
