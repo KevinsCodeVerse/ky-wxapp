@@ -132,8 +132,7 @@
 			"path": "pages/my/pt/goodsTgDt",
 			"style": {
 				"navigationBarTitleText": "平台推广中心",
-				"enablePullDownRefresh": false,
-				"navigationStyle": "custom"
+				"enablePullDownRefresh": false
 			}
 		},
 		{
@@ -197,6 +196,14 @@
 			"style" : 
 			{
 				"navigationBarTitleText" : "余额转换",
+				"enablePullDownRefresh" : false
+			}
+		},
+		{
+			"path" : "pages/my/pt/flow/flow",
+			"style" : 
+			{
+				"navigationBarTitleText" : "明细",
 				"enablePullDownRefresh" : false
 			}
 		}
