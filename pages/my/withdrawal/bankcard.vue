@@ -65,7 +65,7 @@
 						pageSize: 1,
 					},
 					success: (res) => {
-						if(res) {
+						if(res && res.length>0) {
 							this.addFrom = res[0];
 							this.addFrom.bank = res[0].cardName;
 						}
